@@ -5,6 +5,8 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { CATEGORIES, CATEGORY_ICONS } from "@/lib/categories";
 import PromoButton from "@/components/PromoButton";
+import CurrencySwitcher from "@/components/CurrencySwitcher";
+import CommunityButton from "@/components/CommunityButton";
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -34,7 +36,7 @@ export default function Navbar() {
             </span>
           </Link>
 
-          <div className="hidden md:flex items-center gap-1">
+          <div className="hidden lg:flex items-center gap-1">
             <Link href="/" className={`nav-link ${isActive("/") ? "active" : ""}`}>
               Home
             </Link>
@@ -43,6 +45,7 @@ export default function Navbar() {
             </Link>
 
             <PromoButton className="nav-link flex items-center gap-1.5" />
+            <CommunityButton className="nav-link flex items-center gap-1.5" />
 
             <div className="relative" onMouseEnter={() => setCatsOpen(true)} onMouseLeave={() => setCatsOpen(false)}>
               <button className={`nav-link flex items-center gap-1.5 ${isActive("/category") ? "active" : ""}`}>
@@ -75,14 +78,17 @@ export default function Navbar() {
             </div>
           </div>
 
-          <div className="hidden md:block">
-            <Link href="/products" className="btn-primary px-6 py-3">
-              Browse finds →
-            </Link>
+          <div className="flex items-center gap-2 ml-auto lg:ml-0">
+            <CurrencySwitcher />
+            <div className="hidden lg:block">
+              <Link href="/products" className="btn-primary px-6 py-3">
+                Browse finds →
+              </Link>
+            </div>
           </div>
 
           <button
-            className="md:hidden p-2 rounded-xl hover:bg-white/10"
+            className="lg:hidden p-2 rounded-xl hover:bg-white/10"
             onClick={() => setMenuOpen(!menuOpen)}
             aria-label="Toggle menu"
           >
@@ -93,7 +99,7 @@ export default function Navbar() {
         </div>
 
         {menuOpen && (
-          <div className="md:hidden mt-3 pt-3 pb-2" style={{ borderTop: "1px solid var(--line-soft)" }}>
+          <div className="lg:hidden mt-3 pt-3 pb-2" style={{ borderTop: "1px solid var(--line-soft)" }}>
             <div className="flex flex-col gap-1">
               <Link href="/" className="py-2.5 px-3 rounded-xl hover:bg-white/10 font-semibold" onClick={() => setMenuOpen(false)}>
                 Home
@@ -102,6 +108,7 @@ export default function Navbar() {
                 Products
               </Link>
               <PromoButton className="py-2.5 px-3 rounded-xl hover:bg-white/10 font-semibold text-left flex items-center gap-2" />
+              <CommunityButton className="py-2.5 px-3 rounded-xl hover:bg-white/10 font-semibold text-left flex items-center gap-2" />
               <p className="eyebrow px-3 mt-3 mb-1">Categories</p>
               <div className="grid grid-cols-2 gap-1">
                 {CATEGORIES.map((cat) => (

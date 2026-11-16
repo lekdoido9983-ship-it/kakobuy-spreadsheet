@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getFeaturedProducts, getAllProducts, getCategoryStats, CATEGORIES } from "@/lib/products";
 import ProductCard from "@/components/ProductCard";
 import SearchBar from "@/components/SearchBar";
+import Price from "@/components/Price";
 
 export default function HomePage() {
   const featured = getFeaturedProducts(20);
@@ -98,7 +99,7 @@ export default function HomePage() {
                     <span className="text-xs font-bold truncate" style={{ color: "var(--text)" }}>
                       {p.name}
                     </span>
-                    <span className="price-tag text-sm">${p.price?.toFixed(0)}</span>
+                    <span className="price-tag text-sm"><Price usd={p.price} /></span>
                   </div>
                 </Link>
               );

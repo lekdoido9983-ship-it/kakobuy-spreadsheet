@@ -112,33 +112,160 @@ function Login({ configured, onDone }: { configured: boolean; onDone: () => void
   );
 }
 
+interface Community {
+  title: string;
+  discordUrl: string;
+  telegramUrl: string;
+  buttonLabel: string;
+  joinUrl: string;
+  text: string;
+}
+interface Welcome {
+  enabled: boolean;
+  title: string;
+  discount: string;
+  message: string;
+  code: string;
+  note: string;
+}
+type ContentData = { coupons: Coupon[]; notices: Notice[]; community: Community; welcome: Welcome };
+
 function useContent() {
   const [coupons, setCoupons] = useState<Coupon[]>([]);
   const [notices, setNotices] = useState<Notice[]>([]);
+  const [community, setCommunity] = useState<Community | null>(null);
+  const [welcome, setWelcome] = useState<Welcome | null>(null);
   const [dirty, setDirty] = useState(false);
   const [msg, setMsg] = useState("");
 
   useEffect(() => {
-    api<{ coupons: Coupon[]; notices: Notice[] }>("/api/admin/content").then((r) => {
+    api<ContentData>("/api/admin/content").then((r) => {
       if (r.ok) {
         setCoupons(r.data.coupons);
         setNotices(r.data.notices);
+        setCommunity(r.data.community);
+        setWelcome(r.data.welcome);
       }
     });
   }, []);
 
   const save = async () => {
     setMsg("Saving…");
-    const r = await api<{ coupons: Coupon[]; notices: Notice[] }>("/api/admin/content", { method: "PUT", body: JSON.stringify({ coupons, notices }) });
+    const r = await api<ContentData>("/api/admin/content", { method: "PUT", body: JSON.stringify({ coupons, notices, community, welcome }) });
     if (r.ok) {
       setCoupons(r.data.coupons);
       setNotices(r.data.notices);
+      setCommunity(r.data.community);
+      setWelcome(r.data.welcome);
       setDirty(false);
       setMsg("Saved ✓ — visitors see it within about 30 seconds.");
     } else setMsg(r.data.error || "Could not save.");
   };
 
-  return { coupons, notices, setCoupons: (v: Coupon[]) => (setCoupons(v), setDirty(true)), setNotices: (v: Notice[]) => (setNotices(v), setDirty(true)), dirty, save, msg };
+  return {
+    coupons,
+    notices,
+    community,
+    welcome,
+    setCoupons: (v: Coupon[]) => (setCoupons(v), setDirty(true)),
+    setNotices: (v: Notice[]) => (setNotices(v), setDirty(true)),
+    setCommunity: (v: Community) => (setCommunity(v), setDirty(true)),
+    setWelcome: (v: Welcome) => (setWelcome(v), setDirty(true)),
+    dirty,
+    save,
+    msg,
+  };
+}
+
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <label className="block">
+      <span className="text-[0.7rem] font-bold tracking-widest uppercase" style={{ color: "var(--text-dim)" }}>
+        {label}
+      </span>
+      <div className="mt-1">{children}</div>
+    </label>
+  );
+}
+
+function CommunityTab({ c }: { c: ReturnType<typeof useContent> }) {
+  const cm = c.community;
+  const w = c.welcome;
+  if (!cm || !w) return <p className="text-sm py-10 text-center" style={{ color: "var(--text-dim)" }}>Loading…</p>;
+  return (
+    <div className="space-y-6">
+      <section className="rounded-2xl p-5 space-y-4" style={card}>
+        <div>
+          <h2 className="font-extrabold">Community window</h2>
+          <p className="text-xs mt-1" style={{ color: "var(--text-muted)" }}>
+            Opens from the <strong>Community</strong> tab in the top bar. Change the links any time.
+          </p>
+        </div>
+        <Field label="Window title">
+          <input className={inputCls} style={inputStyle} value={cm.title} onChange={(e) => c.setCommunity({ ...cm, title: e.target.value })} />
+        </Field>
+        <div className="grid gap-4 md:grid-cols-2">
+          <Field label="Discord link">
+            <input className={inputCls} style={inputStyle} placeholder="https://discord.gg/…" value={cm.discordUrl} onChange={(e) => c.setCommunity({ ...cm, discordUrl: e.target.value })} />
+          </Field>
+          <Field label="Telegram link">
+            <input className={inputCls} style={inputStyle} placeholder="https://t.me/…" value={cm.telegramUrl} onChange={(e) => c.setCommunity({ ...cm, telegramUrl: e.target.value })} />
+          </Field>
+          <Field label="Main button text">
+            <input className={inputCls} style={inputStyle} value={cm.buttonLabel} onChange={(e) => c.setCommunity({ ...cm, buttonLabel: e.target.value })} />
+          </Field>
+          <Field label="Main button link (empty = Discord link)">
+            <input className={inputCls} style={inputStyle} placeholder="https://…" value={cm.joinUrl} onChange={(e) => c.setCommunity({ ...cm, joinUrl: e.target.value })} />
+          </Field>
+        </div>
+        <Field label="Text under the buttons">
+          <textarea className={inputCls} style={inputStyle} rows={3} value={cm.text} onChange={(e) => c.setCommunity({ ...cm, text: e.target.value })} />
+        </Field>
+      </section>
+
+      <section className="rounded-2xl p-5 space-y-4" style={card}>
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h2 className="font-extrabold">Welcome gift popup</h2>
+            <p className="text-xs mt-1" style={{ color: "var(--text-muted)" }}>
+              Shown to each visitor once per day, on their first visit of that day. They close it with the ✕ or by clicking outside it.
+            </p>
+          </div>
+          <Toggle on={w.enabled} onChange={(v) => c.setWelcome({ ...w, enabled: v })} label={w.enabled ? "On" : "Off"} />
+        </div>
+        <div className="grid gap-4 md:grid-cols-2">
+          <Field label="Small title">
+            <input className={inputCls} style={inputStyle} value={w.title} onChange={(e) => c.setWelcome({ ...w, title: e.target.value })} />
+          </Field>
+          <Field label="Big discount text (e.g. 10% OFF)">
+            <input className={inputCls} style={inputStyle} value={w.discount} onChange={(e) => c.setWelcome({ ...w, discount: e.target.value })} />
+          </Field>
+          <Field label="Coupon code">
+            <input className={inputCls} style={inputStyle} value={w.code} onChange={(e) => c.setWelcome({ ...w, code: e.target.value.toUpperCase() })} />
+          </Field>
+          <Field label="Note (e.g. first purchase only)">
+            <input className={inputCls} style={inputStyle} value={w.note} onChange={(e) => c.setWelcome({ ...w, note: e.target.value })} />
+          </Field>
+        </div>
+        <Field label="Message">
+          <textarea className={inputCls} style={inputStyle} rows={2} value={w.message} onChange={(e) => c.setWelcome({ ...w, message: e.target.value })} />
+        </Field>
+        <button
+          type="button"
+          className="btn-secondary px-5 py-2.5 text-sm"
+          onClick={() => {
+            try {
+              localStorage.removeItem("kb_welcome_day");
+            } catch {}
+            window.open("/", "_blank");
+          }}
+        >
+          Preview on the site (resets today&apos;s popup for this browser)
+        </button>
+      </section>
+      <SaveBar dirty={c.dirty} save={c.save} msg={c.msg} />
+    </div>
+  );
 }
 
 function SaveBar({ dirty, save, msg }: { dirty: boolean; save: () => void; msg: string }) {
@@ -434,7 +561,7 @@ function Overview({ c, me }: { c: ReturnType<typeof useContent>; me: Me }) {
   );
 }
 
-const TABS = ["Overview", "Coupons", "Notifications", "Products"] as const;
+const TABS = ["Overview", "Coupons", "Notifications", "Community", "Products"] as const;
 
 export default function AdminApp() {
   const [me, setMe] = useState<Me | null>(null);
@@ -481,6 +608,7 @@ export default function AdminApp() {
       {tab === "Overview" && <Overview c={content} me={me} />}
       {tab === "Coupons" && <CouponsTab c={content} />}
       {tab === "Notifications" && <NoticesTab c={content} />}
+      {tab === "Community" && <CommunityTab c={content} />}
       {tab === "Products" && <ProductsTab />}
     </div>
   );

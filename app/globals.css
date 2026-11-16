@@ -56,6 +56,8 @@ body {
 }
 
 @layer components {
+  .qv-body { display: flex; flex-direction: column; }
+
   /* Floating pill navbar */
   .navbar-wrap {
     position: sticky;
@@ -341,4 +343,14 @@ body {
 }
 .scrollbar-none::-webkit-scrollbar {
   display: none;
+}
+
+/* (unlayered on purpose: must win over utility classes) Quick view on short, wide screens (phones held sideways): gallery left, info right */
+@media (max-height: 520px) and (min-width: 560px) {
+  .qv-modal { max-width: 800px; padding: 14px; }
+  .qv-head { position: absolute; top: 10px; right: 10px; margin: 0; z-index: 10; }
+  .qv-head .eyebrow { display: none; }
+  .qv-body { flex-direction: row; gap: 16px; }
+  .qv-gallery { flex: 1 1 0; min-width: 0; }
+  .qv-info { width: 270px; display: flex; flex-direction: column; justify-content: center; }
 }

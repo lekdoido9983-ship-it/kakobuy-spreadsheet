@@ -1,10 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
 import { Product, CATEGORY_ICONS, galleryImages } from "@/lib/categories";
 import ProductGallery from "@/components/ProductGallery";
+import Price from "@/components/Price";
+import { preloadImages } from "@/lib/preload";
 
 interface Props {
   product: Product;
@@ -12,8 +14,17 @@ interface Props {
 
 function QuickView({ product, onClose }: { product: Product; onClose: () => void }) {
   const icon = CATEGORY_ICONS[product.category] ?? "🛍️";
-  const displayPrice = product.price ? `$${product.price.toFixed(2).replace(/\.00$/, "")}` : "See price";
   const gallery = galleryImages(product);
+  const [going, setGoing] = useState(false);
+  const goingRef = useRef(false);
+
+  // After "Full details" the list page is hidden (kept alive for instant Back).
+  // When that happens, close the modal so Back returns to the plain list.
+  useEffect(() => {
+    return () => {
+      if (goingRef.current) onClose();
+    };
+  }, [onClose]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
@@ -36,7 +47,7 @@ function QuickView({ product, onClose }: { product: Product; onClose: () => void
       aria-label={product.name}
     >
       <div
-        className="relative w-full max-w-lg rounded-3xl p-5 flex flex-col overflow-hidden"
+        className="qv-modal relative w-full max-w-lg rounded-3xl p-5 flex flex-col overflow-hidden"
         style={{
           height: "min(94dvh, 760px)",
           background: "linear-gradient(165deg, rgba(58,38,84,0.98), rgba(24,15,38,0.99))",
@@ -45,7 +56,7 @@ function QuickView({ product, onClose }: { product: Product; onClose: () => void
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between mb-3 shrink-0">
+        <div className="qv-head flex items-center justify-between mb-3 shrink-0">
           <p className="eyebrow">A closer look</p>
           <button
             onClick={onClose}
@@ -57,7 +68,8 @@ function QuickView({ product, onClose }: { product: Product; onClose: () => void
           </button>
         </div>
 
-        <div className="flex-1 min-h-0">
+        <div className="qv-body flex-1 min-h-0">
+        <div className="qv-gallery flex-1 min-h-0">
           <ProductGallery
             name={product.name}
             full={gallery.full}
@@ -68,7 +80,7 @@ function QuickView({ product, onClose }: { product: Product; onClose: () => void
           />
         </div>
 
-        <div className="shrink-0">
+        <div className="qv-info shrink-0">
           <div className="flex items-center justify-between gap-3 mt-3">
             <span
               className="badge"
@@ -76,7 +88,9 @@ function QuickView({ product, onClose }: { product: Product; onClose: () => void
             >
               {product.category}
             </span>
-            <div className="price-tag text-2xl">{displayPrice}</div>
+            <div className="price-tag text-2xl">
+              <Price usd={product.price} />
+            </div>
           </div>
           <h2
             className="font-black text-lg mt-2 leading-snug"
@@ -93,9 +107,19 @@ function QuickView({ product, onClose }: { product: Product; onClose: () => void
           <p className="text-[0.65rem] mt-1 mb-3" style={{ color: "var(--text-dim)" }}>
             Third-party photos. Prices are indicative.
           </p>
-          <Link href={`/product/${product.slug}`} className="btn-primary w-full py-3.5" onClick={onClose}>
-            Full details →
+          <Link
+            href={`/product/${product.slug}`}
+            className="btn-primary w-full py-3.5"
+            style={going ? { opacity: 0.75, pointerEvents: "none" } : undefined}
+            onClick={(e) => {
+              if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+              goingRef.current = true;
+              setGoing(true);
+            }}
+          >
+            {going ? "Opening…" : "Full details →"}
           </Link>
+        </div>
         </div>
       </div>
     </div>,
@@ -106,13 +130,22 @@ function QuickView({ product, onClose }: { product: Product; onClose: () => void
 export default function ProductCard({ product }: Props) {
   const [open, setOpen] = useState(false);
   const icon = CATEGORY_ICONS[product.category] ?? "🛍️";
-  const displayPrice = product.price ? `$${product.price.toFixed(2).replace(/\.00$/, "")}` : "See price";
+  // start fetching the quick-view photos the moment the pointer/finger reaches the card
+  const warm = () => {
+    if (!product.qc) return;
+    const g = galleryImages(product);
+    preloadImages(g.thumbs);
+    preloadImages(g.full);
+  };
 
   return (
     <>
       <Link
         href={`/product/${product.slug}`}
         className="product-card cursor-pointer"
+        onPointerEnter={warm}
+        onTouchStart={warm}
+        onFocus={warm}
         onClick={(e) => {
           if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
           e.preventDefault();
@@ -123,7 +156,7 @@ export default function ProductCard({ product }: Props) {
           <div className="product-image-frame">
             {product.image ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={product.image} alt={product.name} loading="lazy" decoding="async" />
+              <img src={product.image} alt={product.name} decoding="async" />
             ) : (
               <span style={{ fontSize: "4.5rem", opacity: 0.8 }}>{icon}</span>
             )}
@@ -156,7 +189,9 @@ export default function ProductCard({ product }: Props) {
             {product.name}
           </h3>
 
-          <div className="price-tag text-xl mb-3 mt-auto">{displayPrice}</div>
+          <div className="price-tag text-xl mb-3 mt-auto">
+            <Price usd={product.price} />
+          </div>
 
           <span className="buy-btn">Quick view ↗</span>
         </div>

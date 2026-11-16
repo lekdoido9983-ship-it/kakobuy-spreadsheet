@@ -4,7 +4,10 @@ import { SITE_URL, SITE_NAME } from "@/lib/site";
 import Link from "next/link";
 import { getProductBySlug, getAllProducts, CATEGORY_ICONS } from "@/lib/products";
 import ProductCard from "@/components/ProductCard";
+import { Suspense } from "react";
 import ProductGallery from "@/components/ProductGallery";
+import Price from "@/components/Price";
+import { ProductSkeleton } from "@/components/Skeletons";
 import { galleryImages } from "@/lib/categories";
 
 export async function generateStaticParams() {
@@ -28,13 +31,20 @@ export async function generateMetadata({ params }: PageProps<"/product/[slug]">)
   };
 }
 
-export default async function ProductPage({ params }: PageProps<"/product/[slug]">) {
+export default function ProductPage({ params }: PageProps<"/product/[slug]">) {
+  return (
+    <Suspense fallback={<ProductSkeleton />}>
+      <ProductContent params={params} />
+    </Suspense>
+  );
+}
+
+async function ProductContent({ params }: Pick<PageProps<"/product/[slug]">, "params">) {
   const { slug } = await params;
   const product = getProductBySlug(slug);
   if (!product) notFound();
 
   const icon = CATEGORY_ICONS[product.category] ?? "🛍️";
-  const displayPrice = product.price ? `$${product.price.toFixed(2).replace(/\.00$/, "")}` : "See price";
 
   const gallery = galleryImages(product);
 
@@ -100,7 +110,9 @@ export default async function ProductPage({ params }: PageProps<"/product/[slug]
             {product.name}
           </h1>
 
-          <div className="price-tag text-5xl mb-8">{displayPrice}</div>
+          <div className="price-tag text-5xl mb-8">
+            <Price usd={product.price} />
+          </div>
 
           <div
             className="rounded-2xl p-5 mb-5 text-sm leading-relaxed space-y-3"

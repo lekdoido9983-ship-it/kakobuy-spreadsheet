@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Analytics } from "@vercel/analytics/next";
 import NewsletterPopup from "@/components/NewsletterPopup";
+import WelcomePopup from "@/components/WelcomePopup";
 import { SITE_NAME, SITE_URL, SITE_DESCRIPTION } from "@/lib/site";
 import { Montserrat } from "next/font/google";
 import "./globals.css";
@@ -28,11 +29,12 @@ export const viewport: Viewport = { themeColor: "#100b19" };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${montserrat.variable}`}>
+    <html lang="en" data-scroll-behavior="smooth" className={`${montserrat.variable}`}>
       <body>
         <Navbar />
         <main>{children}</main>
         <Footer />
+        <WelcomePopup />
         <NewsletterPopup />
         {process.env.VERCEL ? <Analytics /> : null}
       </body>

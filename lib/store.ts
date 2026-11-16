@@ -30,16 +30,73 @@ export interface Override {
   kakobuyUrl?: string;
 }
 
+/** "Community" window in the top bar. */
+export interface Community {
+  title: string;
+  discordUrl: string;
+  telegramUrl: string;
+  /** Label of the main button */
+  buttonLabel: string;
+  /** Where the main button goes (empty = the Discord link) */
+  joinUrl: string;
+  /** Free text under the buttons */
+  text: string;
+}
+
+/** First-visit-of-the-day popup with a discount coupon. */
+export interface Welcome {
+  enabled: boolean;
+  title: string;
+  /** Big text, e.g. "10% OFF" */
+  discount: string;
+  message: string;
+  code: string;
+  note: string;
+}
+
+export interface Settings {
+  community: Community;
+  welcome: Welcome;
+}
+
 export interface Store {
   coupons: Coupon[];
   notices: Notice[];
   overrides: Record<string, Override>;
+  settings: Settings;
+}
+
+export const DEFAULT_SETTINGS: Settings = {
+  community: {
+    title: "Join our community",
+    discordUrl: "https://discord.gg/your-invite",
+    telegramUrl: "https://t.me/your-channel",
+    buttonLabel: "Join Community",
+    joinUrl: "",
+    text: "Daily promotions, new products and discounts every day.",
+  },
+  welcome: {
+    enabled: true,
+    title: "Welcome gift",
+    discount: "10% OFF",
+    message: "Use this coupon code on your first purchase.",
+    code: "WELCOME10",
+    note: "Valid on your first purchase only.",
+  },
+};
+
+export function mergeSettings(raw: unknown): Settings {
+  const r = (raw && typeof raw === "object" ? raw : {}) as { community?: Partial<Community>; welcome?: Partial<Welcome> };
+  return {
+    community: { ...DEFAULT_SETTINGS.community, ...(r.community || {}) },
+    welcome: { ...DEFAULT_SETTINGS.welcome, ...(r.welcome || {}) },
+  };
 }
 
 const DIR = process.env.DATA_DIR || path.join(process.cwd(), ".data");
 const FILE = path.join(DIR, "store.json");
 
-const EMPTY: Store = { coupons: [], notices: [], overrides: {} };
+const EMPTY: Store = { coupons: [], notices: [], overrides: {}, settings: DEFAULT_SETTINGS };
 
 let cache: { stamp: number; data: Store } | null = null;
 
@@ -62,6 +119,7 @@ export function readStore(): Store {
         coupons: Array.isArray(raw.coupons) ? raw.coupons : [],
         notices: Array.isArray(raw.notices) ? raw.notices : [],
         overrides: raw.overrides && typeof raw.overrides === "object" ? raw.overrides : {},
+        settings: mergeSettings(raw.settings),
       };
     } catch {
       data = EMPTY;

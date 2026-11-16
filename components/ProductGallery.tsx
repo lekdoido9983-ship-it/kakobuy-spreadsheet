@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { preloadImages } from "@/lib/preload";
 
 interface Props {
   name: string;
@@ -191,7 +192,7 @@ function ThumbStrip({ thumbs, index, setIndex }: { thumbs: string[]; index: numb
             }}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={src} alt="" loading="lazy" decoding="async" draggable={false} className="w-full h-full object-cover" />
+            <img src={src} alt="" decoding="async" draggable={false} className="w-full h-full object-cover" />
           </button>
         ))}
       </div>
@@ -237,6 +238,14 @@ export default function ProductGallery({
   const touchX = useRef<number | null>(null);
   const count = full.length;
 
+  // warm every photo as soon as the gallery shows, so switching/opening is instant
+  useEffect(() => {
+    preloadImages(full.slice(0, 3));
+    preloadImages(thumbs);
+    const t = setTimeout(() => preloadImages(full), 0);
+    return () => clearTimeout(t);
+  }, [full, thumbs]);
+
   const go = (d: number) => setIndex((i) => (i + d + count) % count);
 
   return (
@@ -246,11 +255,10 @@ export default function ProductGallery({
         style={{
           ...(fill ? { flex: "1 1 0", minHeight: 0, aspectRatio: "auto" } : { aspectRatio: aspect }),
           borderRadius: "20px",
-          // clearly closed frame: lighter fill + visible border all the way around
+          // lighter fill sets the frame apart from the dark card; no border
           background:
             "radial-gradient(ellipse at 50% 38%, rgba(255,255,255,0.12), transparent 62%), linear-gradient(180deg, rgba(104,72,148,0.62), rgba(70,46,102,0.92))",
-          border: "1.5px solid rgba(255,180,84,0.4)",
-          boxShadow: "0 10px 30px rgba(0,0,0,0.35), inset 0 0 0 1px rgba(0,0,0,0.25)",
+          boxShadow: "0 10px 30px rgba(0,0,0,0.35)",
         }}
         onTouchStart={(e) => (touchX.current = e.touches[0].clientX)}
         onTouchEnd={(e) => {

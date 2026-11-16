@@ -5,6 +5,7 @@ import { getAllProducts, CATEGORIES, CATEGORY_ICONS } from "@/lib/products";
 import ProductCard from "@/components/ProductCard";
 import SearchBar from "@/components/SearchBar";
 import Pagination from "@/components/Pagination";
+import { searchCatalog } from "@/lib/search";
 
 const PAGE_SIZE = 48;
 
@@ -34,15 +35,7 @@ async function ProductsContent({ searchParams }: PageProps<"/products">) {
   const category = CATEGORIES.find((c) => c.toLowerCase() === categoryParam.toLowerCase()) ?? "";
   const all = getAllProducts();
 
-  let filtered = all;
-  if (category) filtered = filtered.filter((p) => p.category === category);
-  if (q) {
-    const terms = q.toLowerCase().split(/\s+/).filter(Boolean);
-    filtered = filtered.filter((p) => {
-      const n = p.name.toLowerCase();
-      return terms.every((t) => n.includes(t));
-    });
-  }
+  const { items: filtered, mode } = searchCatalog(all, q, category);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const page = Math.min(Math.max(1, parseInt(first(sp.page) ?? "1", 10) || 1), totalPages);
@@ -56,11 +49,30 @@ async function ProductsContent({ searchParams }: PageProps<"/products">) {
           Find your <em>next favorite.</em>
         </h1>
         <p className="text-sm" style={{ color: "var(--text-muted)" }}>
-          {filtered.length.toLocaleString()} finds
+          {mode === "popular"
+            ? "Popular finds"
+            : `${filtered.length.toLocaleString()} ${mode === "similar" ? "similar finds" : "finds"}`}
           {category ? ` in ${category}` : ""}
-          {q ? ` matching "${q}"` : ""}
+          {q && mode === "exact" ? ` matching "${q}"` : ""}
         </p>
       </div>
+
+      {(mode === "similar" || mode === "popular") && (
+        <div
+          className="mb-6 rounded-2xl px-5 py-4 text-sm"
+          role="status"
+          style={{ background: "rgba(255,180,84,0.08)", border: "1px solid var(--line)", color: "var(--text-muted)" }}
+        >
+          <p className="font-bold" style={{ color: "var(--text)" }}>
+            We couldn&apos;t find an exact match for &ldquo;{q}&rdquo;.
+          </p>
+          <p className="mt-0.5">
+            {mode === "similar"
+              ? "Here are similar finds you might like instead."
+              : "Here are some of our most popular finds instead — try another word or pick a category."}
+          </p>
+        </div>
+      )}
 
       <div className="mb-5">
         <SearchBar key={`${q}|${category}`} defaultValue={q} category={category} size="lg" />

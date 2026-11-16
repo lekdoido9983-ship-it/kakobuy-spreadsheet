@@ -27,10 +27,14 @@ export default function NewsletterPopup() {
       if (last && Date.now() - last < DISMISS_DAYS * 86_400_000) return;
     } catch {}
 
-    const timer = setTimeout(() => setOpen(true), SHOW_AFTER_MS);
+    // never stack on top of another open window (welcome gift, quick view, coupons…)
+    const show = () => {
+      if (!document.querySelector('[role="dialog"]')) setOpen(true);
+    };
+    const timer = setTimeout(show, SHOW_AFTER_MS);
     const onScroll = () => {
       const scrolled = window.scrollY / Math.max(1, document.body.scrollHeight - window.innerHeight);
-      if (scrolled > 0.6) {
+      if (scrolled > 0.6 && !document.querySelector('[role="dialog"]')) {
         setOpen(true);
         window.removeEventListener("scroll", onScroll);
       }

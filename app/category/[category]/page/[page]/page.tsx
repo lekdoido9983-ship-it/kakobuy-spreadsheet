@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { CATEGORIES } from "@/lib/categories";
+import { Suspense } from "react";
 import CategoryView, { categoryPageCount } from "@/components/CategoryView";
+import { CategorySkeleton } from "@/components/Skeletons";
 
 export function generateStaticParams() {
   return CATEGORIES.flatMap((cat) =>
@@ -23,7 +25,15 @@ export async function generateMetadata({ params }: PageProps<"/category/[categor
   };
 }
 
-export default async function CategoryPagedPage({ params }: PageProps<"/category/[category]/page/[page]">) {
+export default function CategoryPagedPage({ params }: PageProps<"/category/[category]/page/[page]">) {
+  return (
+    <Suspense fallback={<CategorySkeleton />}>
+      <CategoryPagedContent params={params} />
+    </Suspense>
+  );
+}
+
+async function CategoryPagedContent({ params }: Pick<PageProps<"/category/[category]/page/[page]">, "params">) {
   const { category, page } = await params;
   const catName = CATEGORIES.find((c) => c.toLowerCase() === category.toLowerCase());
   const n = Number(page);

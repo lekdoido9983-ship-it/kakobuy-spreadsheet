@@ -3,25 +3,9 @@
 import { useCallback, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
+import { usePromo } from "@/lib/promoClient";
 
-interface PromoCoupon {
-  id: string;
-  code: string;
-  title: string;
-  description: string;
-  expiresAt?: string;
-}
-interface PromoNotice {
-  id: string;
-  title: string;
-  message: string;
-  link?: string;
-  createdAt: string;
-}
-interface Promo {
-  coupons: PromoCoupon[];
-  notices: PromoNotice[];
-}
+type Promo = Pick<NonNullable<ReturnType<typeof usePromo>>, "coupons" | "notices">;
 
 const SEEN_KEY = "kb_promo_seen";
 
@@ -145,21 +129,13 @@ function PromoModal({ promo, onClose }: { promo: Promo; onClose: () => void }) {
   );
 }
 
-export default function PromoButton({ className = "", label = "Coupons" }: { className?: string; label?: string }) {
-  const [promo, setPromo] = useState<Promo | null>(null);
+export default function PromoButton({ className = "", label = "Coupons", onOpen }: { className?: string; label?: string; onOpen?: () => void }) {
+  const promo = usePromo();
   const [open, setOpen] = useState(false);
-  const [seen, setSeen] = useState<string>("");
-
-  useEffect(() => {
-    fetch("/api/promo")
-      .then((r) => (r.ok ? r.json() : null))
-      .then((d) => {
-        if (!d) return;
-        setSeen(localStorage.getItem(SEEN_KEY) || "");
-        setPromo(d);
-      })
-      .catch(() => {});
-  }, []);
+  const [justSeen, setJustSeen] = useState<string>("");
+  // promo only exists after mount (client fetch), so reading localStorage here cannot cause a hydration mismatch
+  const stored = promo ? (() => { try { return localStorage.getItem(SEEN_KEY) || ""; } catch { return ""; } })() : "";
+  const seen = justSeen || stored;
 
   const signature = promo ? [...promo.coupons.map((c) => c.id), ...promo.notices.map((n) => n.id)].join(",") : "";
   const count = promo ? promo.coupons.length + promo.notices.length : 0;
@@ -167,10 +143,13 @@ export default function PromoButton({ className = "", label = "Coupons" }: { cla
 
   const close = useCallback(() => setOpen(false), []);
   const toggle = () => {
+    onOpen?.();
     setOpen(true);
     if (signature) {
-      localStorage.setItem(SEEN_KEY, signature);
-      setSeen(signature);
+      try {
+        localStorage.setItem(SEEN_KEY, signature);
+      } catch {}
+      setJustSeen(signature);
     }
   };
 
