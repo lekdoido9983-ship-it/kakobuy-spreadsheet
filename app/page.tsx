@@ -8,42 +8,107 @@ export default function HomePage() {
   const totalProducts = Object.values(stats).reduce((a, b) => a + b, 0);
 
   return (
-    <div className="star-bg min-h-screen">
+    <div className="min-h-screen" style={{ background: "var(--bg)" }}>
       {/* Hero */}
-      <section className="px-4 pt-16 pb-12 text-center max-w-4xl mx-auto">
+      <section className="relative overflow-hidden px-4 pt-20 pb-16 text-center">
+        {/* Background glows */}
         <div
-          className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold mb-6"
-          style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "var(--text-muted)" }}
-        >
-          <span>🔥</span>
-          <span>{totalProducts.toLocaleString()} products available</span>
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background:
+              "radial-gradient(ellipse 80% 60% at 50% 0%, rgba(139,92,246,0.18) 0%, transparent 70%), " +
+              "radial-gradient(ellipse 60% 40% at 80% 50%, rgba(244,179,53,0.08) 0%, transparent 60%)",
+          }}
+        />
+
+        <div className="relative max-w-4xl mx-auto">
+          {/* Badge */}
+          <div className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold mb-6"
+            style={{ background: "rgba(139,92,246,0.12)", border: "1px solid rgba(139,92,246,0.25)", color: "var(--text-muted)" }}>
+            <span>🔥</span>
+            <span>{totalProducts.toLocaleString()} products available</span>
+          </div>
+
+          <h1
+            className="font-black text-5xl md:text-7xl leading-[1.08] mb-5"
+            style={{ fontFamily: "var(--font-display)", letterSpacing: "-0.03em" }}
+          >
+            Find Your Perfect{" "}
+            <span
+              style={{
+                background: "linear-gradient(135deg, #c084fc 0%, #f4b335 60%, #f97316 100%)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundClip: "text",
+              }}
+            >
+              Kakobuy
+            </span>
+            <br />Products
+          </h1>
+
+          <p
+            className="text-lg md:text-xl mb-8 max-w-xl mx-auto leading-relaxed"
+            style={{ color: "var(--text-muted)" }}
+          >
+            Browse 6,000+ shoes, clothes, bags and accessories. All products link directly to Kakobuy with the best prices.
+          </p>
+
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <Link
+              href="/products"
+              className="btn-primary text-base px-8 py-4 font-black"
+              style={{ borderRadius: "14px", fontSize: "1rem" }}
+            >
+              🛍️ Browse All Products
+            </Link>
+            <Link
+              href="#categories"
+              className="btn-secondary text-base px-8 py-4 font-bold"
+              style={{ borderRadius: "14px" }}
+            >
+              View Categories
+            </Link>
+          </div>
         </div>
+      </section>
 
-        <h1
-          className="font-black text-4xl md:text-6xl leading-tight mb-4"
-          style={{ fontFamily: "var(--font-display)" }}
+      {/* Stats strip */}
+      <section className="px-4 py-6">
+        <div
+          className="max-w-3xl mx-auto grid grid-cols-4 gap-4 rounded-2xl py-5 px-6"
+          style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}
         >
-          Find Your Perfect{" "}
-          <span className="gradient-text">Kakobuy</span>{" "}
-          Products
-        </h1>
-
-        <p className="text-lg md:text-xl mb-8 max-w-2xl mx-auto" style={{ color: "var(--text-muted)" }}>
-          Browse thousands of shoes, clothes, bags and accessories. All products link directly to Kakobuy.
-        </p>
-
-        <div className="flex flex-col sm:flex-row gap-3 justify-center">
-          <Link href="/products" className="btn-primary text-base px-8 py-3.5">
-            Browse All Products
-          </Link>
-          <Link href="#categories" className="btn-secondary text-base px-8 py-3.5">
-            View Categories
-          </Link>
+          {[
+            { label: "Products", value: totalProducts.toLocaleString(), icon: "📦" },
+            { label: "Categories", value: "14", icon: "🗂️" },
+            { label: "Platform", value: "Kakobuy", icon: "🛒" },
+            { label: "Commission", value: "18%", icon: "💰" },
+          ].map((stat) => (
+            <div key={stat.label} className="text-center">
+              <div className="text-xl mb-0.5">{stat.icon}</div>
+              <div
+                className="font-black text-lg"
+                style={{
+                  fontFamily: "var(--font-display)",
+                  background: "linear-gradient(135deg, #f3f2ff, #c084fc)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  backgroundClip: "text",
+                }}
+              >
+                {stat.value}
+              </div>
+              <div className="text-xs font-semibold mt-0.5" style={{ color: "var(--text-muted)" }}>
+                {stat.label}
+              </div>
+            </div>
+          ))}
         </div>
       </section>
 
       {/* Categories */}
-      <section id="categories" className="px-4 py-12 max-w-7xl mx-auto">
+      <section id="categories" className="px-4 py-10 max-w-7xl mx-auto">
         <div className="flex items-center justify-between mb-6">
           <h2 className="font-black text-2xl" style={{ fontFamily: "var(--font-display)" }}>
             Categories
@@ -67,7 +132,7 @@ export default function HomePage() {
       </section>
 
       {/* Featured Products */}
-      <section className="px-4 py-12 max-w-7xl mx-auto">
+      <section className="px-4 py-10 max-w-7xl mx-auto">
         <div className="flex items-center justify-between mb-6">
           <h2 className="font-black text-2xl" style={{ fontFamily: "var(--font-display)" }}>
             Featured Products
@@ -83,32 +148,10 @@ export default function HomePage() {
           ))}
         </div>
 
-        <div className="text-center mt-8">
-          <Link href="/products" className="btn-primary px-10 py-3.5 text-base">
-            Browse All {totalProducts.toLocaleString()} Products
+        <div className="text-center mt-10">
+          <Link href="/products" className="btn-primary px-10 py-4 text-base font-black" style={{ borderRadius: "14px" }}>
+            Browse All {totalProducts.toLocaleString()} Products →
           </Link>
-        </div>
-      </section>
-
-      {/* Stats bar */}
-      <section className="px-4 py-10 border-t border-white/5">
-        <div className="max-w-4xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-          {[
-            { label: "Total Products", value: totalProducts.toLocaleString(), icon: "📦" },
-            { label: "Categories", value: CATEGORIES.length.toString(), icon: "🗂️" },
-            { label: "Platform", value: "Kakobuy", icon: "🛒" },
-            { label: "Free to Browse", value: "100%", icon: "✅" },
-          ].map((stat) => (
-            <div key={stat.label}>
-              <div className="text-2xl mb-1">{stat.icon}</div>
-              <div className="font-black text-2xl gradient-text" style={{ fontFamily: "var(--font-display)" }}>
-                {stat.value}
-              </div>
-              <div className="text-sm font-semibold mt-0.5" style={{ color: "var(--text-muted)" }}>
-                {stat.label}
-              </div>
-            </div>
-          ))}
         </div>
       </section>
     </div>
