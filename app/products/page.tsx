@@ -1,42 +1,52 @@
-"use client";
-
-import { useState, useMemo, Suspense } from "react";
+import { Suspense } from "react";
+import type { Metadata } from "next";
+import Link from "next/link";
 import { getAllProducts, CATEGORIES, CATEGORY_ICONS } from "@/lib/products";
 import ProductCard from "@/components/ProductCard";
 import SearchBar from "@/components/SearchBar";
+import Pagination from "@/components/Pagination";
 
 const PAGE_SIZE = 48;
-const allProducts = getAllProducts();
 
-function ProductsContent() {
-  const [query, setQuery] = useState("");
-  const [category, setCategory] = useState("");
-  const [page, setPage] = useState(1);
+export const metadata: Metadata = {
+  title: "All products",
+  description: "Search and filter 8,000+ Kakobuy finds by category, with photos and prices.",
+  alternates: { canonical: "/products" },
+};
 
-  const filtered = useMemo(() => {
-    let result = allProducts;
-    if (category) {
-      result = result.filter((p) => p.category.toLowerCase() === category.toLowerCase());
-    }
-    if (query.trim()) {
-      const q = query.toLowerCase().trim();
-      result = result.filter((p) => p.name.toLowerCase().includes(q));
-    }
-    return result;
-  }, [query, category]);
+function first(v: string | string[] | undefined) {
+  return Array.isArray(v) ? v[0] : v;
+}
 
-  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
-  const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+function href(params: { q?: string; category?: string; page?: number }) {
+  const sp = new URLSearchParams();
+  if (params.q) sp.set("q", params.q);
+  if (params.category) sp.set("category", params.category);
+  if (params.page && params.page > 1) sp.set("page", String(params.page));
+  const qs = sp.toString();
+  return qs ? `/products?${qs}` : "/products";
+}
 
-  const handleSearch = (q: string) => {
-    setQuery(q);
-    setPage(1);
-  };
+async function ProductsContent({ searchParams }: PageProps<"/products">) {
+  const sp = await searchParams;
+  const q = (first(sp.q) ?? "").trim().slice(0, 80);
+  const categoryParam = first(sp.category) ?? "";
+  const category = CATEGORIES.find((c) => c.toLowerCase() === categoryParam.toLowerCase()) ?? "";
+  const all = getAllProducts();
 
-  const handleCategory = (cat: string) => {
-    setCategory(cat === category ? "" : cat);
-    setPage(1);
-  };
+  let filtered = all;
+  if (category) filtered = filtered.filter((p) => p.category === category);
+  if (q) {
+    const terms = q.toLowerCase().split(/\s+/).filter(Boolean);
+    filtered = filtered.filter((p) => {
+      const n = p.name.toLowerCase();
+      return terms.every((t) => n.includes(t));
+    });
+  }
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const page = Math.min(Math.max(1, parseInt(first(sp.page) ?? "1", 10) || 1), totalPages);
+  const items = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
@@ -48,88 +58,55 @@ function ProductsContent() {
         <p className="text-sm" style={{ color: "var(--text-muted)" }}>
           {filtered.length.toLocaleString()} finds
           {category ? ` in ${category}` : ""}
-          {query ? ` matching "${query}"` : ""}
+          {q ? ` matching "${q}"` : ""}
         </p>
       </div>
 
-      {/* Search */}
       <div className="mb-5">
-        <SearchBar onSearch={handleSearch} placeholder="Find your next obsession…" size="lg" />
+        <SearchBar key={`${q}|${category}`} defaultValue={q} category={category} size="lg" />
       </div>
 
-      {/* Category filter */}
       <div className="flex gap-2 overflow-x-auto pb-3 mb-6 scrollbar-none">
-        <button
-          onClick={() => handleCategory("")}
-          className={`category-pill ${!category ? "active" : ""}`}
-        >
-          All ({allProducts.length.toLocaleString()})
-        </button>
+        <Link href={href({ q })} className={`category-pill ${!category ? "active" : ""}`}>
+          All ({all.length.toLocaleString()})
+        </Link>
         {CATEGORIES.map((cat) => (
-          <button
+          <Link
             key={cat}
-            onClick={() => handleCategory(cat)}
-            className={`category-pill flex items-center gap-1.5 ${category.toLowerCase() === cat.toLowerCase() ? "active" : ""}`}
+            href={href({ q, category: cat })}
+            className={`category-pill flex items-center gap-1.5 ${category === cat ? "active" : ""}`}
           >
             <span>{CATEGORY_ICONS[cat]}</span>
             {cat}
-          </button>
+          </Link>
         ))}
       </div>
 
-      {/* Products grid */}
-      {paginated.length === 0 ? (
+      {items.length === 0 ? (
         <div className="text-center py-24" style={{ color: "var(--text-muted)" }}>
           <p style={{ fontSize: "3rem", marginBottom: "1rem" }}>🔍</p>
-          <p className="font-semibold text-lg">No products found</p>
-          <p className="text-sm mt-1">Try a different search term or category</p>
+          <p className="font-semibold text-lg">No finds match your search</p>
+          <p className="text-sm mt-1">Try a different word or category.</p>
         </div>
       ) : (
         <>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-            {paginated.map((product) => (
+            {items.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
           </div>
 
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="flex items-center justify-center gap-2 mt-10">
-              <button
-                onClick={() => {
-                  setPage((p) => Math.max(1, p - 1));
-                  window.scrollTo({ top: 0, behavior: "smooth" });
-                }}
-                disabled={page === 1}
-                className="btn-secondary px-5 py-3 disabled:opacity-30"
-              >
-                ← Prev
-              </button>
-              <span className="px-4 text-sm" style={{ color: "var(--text-muted)" }}>
-                Page {page} of {totalPages}
-              </span>
-              <button
-                onClick={() => {
-                  setPage((p) => Math.min(totalPages, p + 1));
-                  window.scrollTo({ top: 0, behavior: "smooth" });
-                }}
-                disabled={page === totalPages}
-                className="btn-secondary px-5 py-3 disabled:opacity-30"
-              >
-                Next →
-              </button>
-            </div>
-          )}
+          <Pagination page={page} totalPages={totalPages} hrefFor={(p) => href({ q, category, page: p })} />
         </>
       )}
     </div>
   );
 }
 
-export default function ProductsPage() {
+export default function ProductsPage(props: PageProps<"/products">) {
   return (
-    <Suspense fallback={<div className="max-w-7xl mx-auto px-4 py-8" style={{ color: "var(--text-muted)" }}>Loading finds…</div>}>
-      <ProductsContent />
+    <Suspense fallback={<div className="max-w-7xl mx-auto px-4 py-8 min-h-[70vh]" />}>
+      <ProductsContent {...props} />
     </Suspense>
   );
 }

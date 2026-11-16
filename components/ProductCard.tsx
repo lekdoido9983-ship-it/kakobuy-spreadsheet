@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
-import { Product, CATEGORY_ICONS } from "@/lib/products";
+import { Product, CATEGORY_ICONS } from "@/lib/categories";
 
 interface Props {
   product: Product;

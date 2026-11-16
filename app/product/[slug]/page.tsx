@@ -1,10 +1,29 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { SITE_URL, SITE_NAME } from "@/lib/site";
 import Link from "next/link";
 import { getProductBySlug, getAllProducts, CATEGORY_ICONS } from "@/lib/products";
 import ProductCard from "@/components/ProductCard";
 
 export async function generateStaticParams() {
   return getAllProducts().map((p) => ({ slug: p.slug }));
+}
+
+export async function generateMetadata({ params }: PageProps<"/product/[slug]">): Promise<Metadata> {
+  const { slug } = await params;
+  const product = getProductBySlug(slug);
+  if (!product) return {};
+  const price = product.price ? ` for ${product.price}` : "";
+  const title = product.name;
+  const description = `${product.name}${price}. See photos and details, then view it on Kakobuy.`;
+  const image = product.image ? `${SITE_URL}${product.image}` : undefined;
+  return {
+    title,
+    description,
+    alternates: { canonical: `/product/${product.slug}` },
+    openGraph: { title, description, url: `/product/${product.slug}`, images: image ? [image] : undefined },
+    twitter: { card: "summary_large_image", title, description, images: image ? [image] : undefined },
+  };
 }
 
 export default async function ProductPage({ params }: PageProps<"/product/[slug]">) {
@@ -19,8 +38,22 @@ export default async function ProductPage({ params }: PageProps<"/product/[slug]
     .filter((p) => p.category === product.category && p.id !== product.id && p.image)
     .slice(0, 10);
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.name,
+    category: product.category,
+    image: product.image ? `${SITE_URL}${product.image}` : undefined,
+    url: `${SITE_URL}/product/${product.slug}`,
+    brand: { "@type": "Organization", name: SITE_NAME },
+    offers: product.price
+      ? { "@type": "Offer", price: product.price, priceCurrency: "USD", availability: "https://schema.org/InStock", url: `${SITE_URL}/product/${product.slug}` }
+      : undefined,
+  };
+
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
       <div className="flex items-center gap-2 text-xs font-semibold mb-8 flex-wrap" style={{ color: "var(--text-dim)" }}>
         <Link href="/" className="hover:text-white transition-colors">
           Home
@@ -85,7 +118,7 @@ export default async function ProductPage({ params }: PageProps<"/product/[slug]
             <a
               href={product.kakobuyUrl}
               target="_blank"
-              rel="noopener noreferrer"
+              rel="noopener noreferrer sponsored nofollow"
               className="w-full py-5 flex items-center justify-center gap-3 rounded-2xl font-extrabold transition-transform hover:-translate-y-0.5"
               style={{ background: "linear-gradient(180deg, #fff3e4, #f3dcc7)", color: "#2a1405", fontSize: "0.95rem" }}
             >

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { CATEGORIES, CATEGORY_ICONS } from "@/lib/products";
+import { CATEGORIES, CATEGORY_ICONS } from "@/lib/categories";
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
