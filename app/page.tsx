@@ -48,7 +48,7 @@ export default function HomePage() {
           </h1>
 
           <p
-            className="text-lg md:text-xl mb-8 max-w-xl mx-auto leading-relaxed"
+            className="text-lg md:text-xl mb-8 max-w-xl mx-auto leading-relaxed text-center"
             style={{ color: "var(--text-muted)" }}
           >
             Browse 6,000+ shoes, clothes, bags and accessories. All products link directly to Kakobuy with the best prices.

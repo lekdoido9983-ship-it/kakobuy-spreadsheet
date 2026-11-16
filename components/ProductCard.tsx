@@ -57,15 +57,37 @@ export default function ProductCard({ product, imageUrl }: Props) {
           className="product-image-frame"
           style={{ background: gradient, boxShadow: `inset 0 0 40px ${accent}` }}
         >
+          {/* Category name watermark */}
+          <span
+            aria-hidden="true"
+            style={{
+              position: "absolute",
+              bottom: "6px",
+              left: 0,
+              right: 0,
+              textAlign: "center",
+              fontSize: "2.6rem",
+              fontWeight: 900,
+              fontFamily: "var(--font-display)",
+              color: "rgba(255,255,255,0.055)",
+              letterSpacing: "-0.04em",
+              userSelect: "none",
+              lineHeight: 1,
+              pointerEvents: "none",
+            }}
+          >
+            {product.category.toUpperCase()}
+          </span>
+
           {imageUrl ? (
             <img
               src={imageUrl}
               alt={product.name}
               loading="lazy"
-              style={{ width: "100%", height: "100%", objectFit: "contain" }}
+              style={{ width: "100%", height: "100%", objectFit: "contain", position: "relative" }}
             />
           ) : (
-            <span style={{ fontSize: "5rem", lineHeight: 1, filter: "drop-shadow(0 4px 16px rgba(0,0,0,0.5))" }}>
+            <span style={{ fontSize: "6.5rem", lineHeight: 1, position: "relative", filter: "drop-shadow(0 8px 24px rgba(0,0,0,0.6))" }}>
               {icon}
             </span>
           )}
