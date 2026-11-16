@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
-import { Product, CATEGORY_ICONS } from "@/lib/categories";
+import { Product, CATEGORY_ICONS, galleryImages } from "@/lib/categories";
+import ProductGallery from "@/components/ProductGallery";
 
 interface Props {
   product: Product;
@@ -12,6 +13,7 @@ interface Props {
 function QuickView({ product, onClose }: { product: Product; onClose: () => void }) {
   const icon = CATEGORY_ICONS[product.category] ?? "🛍️";
   const displayPrice = product.price ? `$${product.price.toFixed(2).replace(/\.00$/, "")}` : "See price";
+  const gallery = galleryImages(product);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
@@ -54,17 +56,16 @@ function QuickView({ product, onClose }: { product: Product; onClose: () => void
           </button>
         </div>
 
-        <div className="product-image-frame" style={{ aspectRatio: "4 / 3", borderRadius: "20px" }}>
-          {product.image ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={product.image} alt={product.name} style={{ padding: "14px" }} />
-          ) : (
-            <span style={{ fontSize: "6rem", opacity: 0.8 }}>{icon}</span>
-          )}
-        </div>
+        <ProductGallery
+          name={product.name}
+          full={gallery.full}
+          thumbs={gallery.thumbs}
+          aspect="4 / 3"
+          fallback={<span style={{ fontSize: "6rem", opacity: 0.8 }}>{icon}</span>}
+        />
 
         <p className="text-[0.7rem] mt-3" style={{ color: "var(--text-dim)" }}>
-          Third-party photos. Prices are indicative.
+          {gallery.full.length > 1 ? "Prices are indicative." : "Third-party photos. Prices are indicative."}
         </p>
 
         <span

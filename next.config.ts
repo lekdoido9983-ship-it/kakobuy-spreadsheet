@@ -9,6 +9,7 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  output: process.env.VERCEL ? undefined : "standalone",
   cacheComponents: true,
   partialPrefetching: true,
   poweredByHeader: false,

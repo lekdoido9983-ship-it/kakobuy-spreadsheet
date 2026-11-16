@@ -4,6 +4,8 @@ import { SITE_URL, SITE_NAME } from "@/lib/site";
 import Link from "next/link";
 import { getProductBySlug, getAllProducts, CATEGORY_ICONS } from "@/lib/products";
 import ProductCard from "@/components/ProductCard";
+import ProductGallery from "@/components/ProductGallery";
+import { galleryImages } from "@/lib/categories";
 
 export async function generateStaticParams() {
   return getAllProducts().map((p) => ({ slug: p.slug }));
@@ -34,6 +36,8 @@ export default async function ProductPage({ params }: PageProps<"/product/[slug]
   const icon = CATEGORY_ICONS[product.category] ?? "🛍️";
   const displayPrice = product.price ? `$${product.price.toFixed(2).replace(/\.00$/, "")}` : "See price";
 
+  const gallery = galleryImages(product);
+
   const related = getAllProducts()
     .filter((p) => p.category === product.category && p.id !== product.id && p.image)
     .slice(0, 10);
@@ -43,7 +47,7 @@ export default async function ProductPage({ params }: PageProps<"/product/[slug]
     "@type": "Product",
     name: product.name,
     category: product.category,
-    image: product.image ? `${SITE_URL}${product.image}` : undefined,
+    image: gallery.full.length ? gallery.full.map((u) => `${SITE_URL}${u}`) : undefined,
     url: `${SITE_URL}/product/${product.slug}`,
     brand: { "@type": "Organization", name: SITE_NAME },
     offers: product.price
@@ -73,14 +77,13 @@ export default async function ProductPage({ params }: PageProps<"/product/[slug]
           className="rounded-3xl p-3"
           style={{ background: "linear-gradient(165deg, rgba(48,31,70,0.95), rgba(22,14,34,0.98))", border: "1px solid var(--line-soft)" }}
         >
-          <div className="product-image-frame" style={{ borderRadius: "20px" }}>
-            {product.image ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={product.image} alt={product.name} style={{ padding: "20px" }} />
-            ) : (
-              <span style={{ fontSize: "7rem", opacity: 0.8 }}>{icon}</span>
-            )}
-          </div>
+          <ProductGallery
+            name={product.name}
+            full={gallery.full}
+            thumbs={gallery.thumbs}
+            padding={20}
+            fallback={<span style={{ fontSize: "7rem", opacity: 0.8 }}>{icon}</span>}
+          />
         </div>
 
         <div className="flex flex-col">
