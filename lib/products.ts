@@ -7,7 +7,8 @@ export interface Product {
   name: string;
   price: number | null;
   kakobuyUrl: string;
-  linkType: string;
+  image?: string;
+  popular?: boolean;
 }
 
 export const CATEGORIES = [
@@ -25,6 +26,8 @@ export const CATEGORIES = [
   "Glasses",
   "Socks",
   "Boxers",
+  "Perfumes",
+  "Watches",
 ];
 
 export const CATEGORY_ICONS: Record<string, string> = {
@@ -42,6 +45,9 @@ export const CATEGORY_ICONS: Record<string, string> = {
   Glasses: "🕶️",
   Socks: "🧦",
   Boxers: "🩲",
+  Perfumes: "🧴",
+  Watches: "⌚",
+  Popular: "🔥",
 };
 
 export const AFFCODE = "8p34q";
@@ -75,7 +81,10 @@ export function getRandomProducts(count: number, excludeIds: number[] = []): Pro
 }
 
 export function getFeaturedProducts(count = 12): Product[] {
-  return products.filter((p) => p.price && p.price > 0).slice(0, count);
+  const withImg = products.filter((p) => p.image && p.price && p.price > 0);
+  const popular = withImg.filter((p) => p.popular);
+  const rest = withImg.filter((p) => !p.popular);
+  return [...popular, ...rest].slice(0, count);
 }
 
 export function getCategoryStats(): Record<string, number> {

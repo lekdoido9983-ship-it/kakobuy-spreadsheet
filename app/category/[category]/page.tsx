@@ -13,12 +13,10 @@ export default async function CategoryPage({ params }: PageProps<"/category/[cat
   if (!catName) notFound();
 
   const products = getProductsByCategory(catName);
-  const icon = CATEGORY_ICONS[catName] ?? "🛍️";
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
-      {/* Breadcrumb */}
-      <div className="flex items-center gap-2 text-sm mb-6" style={{ color: "var(--text-muted)" }}>
+      <div className="flex items-center gap-2 text-xs font-semibold mb-8" style={{ color: "var(--text-dim)" }}>
         <Link href="/" className="hover:text-white transition-colors">
           Home
         </Link>
@@ -27,24 +25,17 @@ export default async function CategoryPage({ params }: PageProps<"/category/[cat
           Products
         </Link>
         <span>/</span>
-        <span style={{ color: "var(--text)" }}>{catName}</span>
+        <span style={{ color: "var(--amber)" }}>{catName}</span>
       </div>
 
-      {/* Header */}
-      <div className="mb-8 flex items-center gap-4">
-        <div style={{ fontSize: "3.5rem" }}>{icon}</div>
-        <div>
-          <h1 className="font-black text-3xl" style={{ fontFamily: "var(--font-display)" }}>
-            {catName}
-          </h1>
-          <p className="mt-1" style={{ color: "var(--text-muted)" }}>
-            {products.length.toLocaleString()} products
-          </p>
-        </div>
+      <div className="mb-8">
+        <p className="eyebrow mb-3">{products.length.toLocaleString()} finds</p>
+        <h1 className="section-title text-4xl md:text-6xl">
+          <em>{catName}</em>
+        </h1>
       </div>
 
-      {/* Category horizontal scroll */}
-      <div className="flex gap-2 overflow-x-auto pb-3 mb-6 scrollbar-none">
+      <div className="flex gap-2 overflow-x-auto pb-3 mb-8 scrollbar-none">
         {CATEGORIES.map((cat) => (
           <Link
             key={cat}

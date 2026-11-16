@@ -41,11 +41,12 @@ function ProductsContent() {
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
       <div className="mb-8">
-        <h1 className="font-black text-3xl mb-2" style={{ fontFamily: "var(--font-display)" }}>
-          All Products
+        <p className="eyebrow mb-3">The finds directory</p>
+        <h1 className="section-title text-4xl md:text-5xl mb-3">
+          Find your <em>next favorite.</em>
         </h1>
-        <p style={{ color: "var(--text-muted)" }}>
-          {filtered.length.toLocaleString()} products
+        <p className="text-sm" style={{ color: "var(--text-muted)" }}>
+          {filtered.length.toLocaleString()} finds
           {category ? ` in ${category}` : ""}
           {query ? ` matching "${query}"` : ""}
         </p>
@@ -53,7 +54,7 @@ function ProductsContent() {
 
       {/* Search */}
       <div className="mb-5">
-        <SearchBar onSearch={handleSearch} placeholder="Search all 6,000+ products…" size="lg" />
+        <SearchBar onSearch={handleSearch} placeholder="Find your next obsession…" size="lg" />
       </div>
 
       {/* Category filter */}
@@ -85,7 +86,7 @@ function ProductsContent() {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
             {paginated.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
@@ -100,7 +101,7 @@ function ProductsContent() {
                   window.scrollTo({ top: 0, behavior: "smooth" });
                 }}
                 disabled={page === 1}
-                className="btn-secondary px-5 py-2.5 text-sm disabled:opacity-30"
+                className="btn-secondary px-5 py-3 disabled:opacity-30"
               >
                 ← Prev
               </button>
@@ -113,7 +114,7 @@ function ProductsContent() {
                   window.scrollTo({ top: 0, behavior: "smooth" });
                 }}
                 disabled={page === totalPages}
-                className="btn-secondary px-5 py-2.5 text-sm disabled:opacity-30"
+                className="btn-secondary px-5 py-3 disabled:opacity-30"
               >
                 Next →
               </button>
@@ -127,7 +128,7 @@ function ProductsContent() {
 
 export default function ProductsPage() {
   return (
-    <Suspense fallback={<div className="max-w-7xl mx-auto px-4 py-8" style={{ color: "var(--text-muted)" }}>Loading products…</div>}>
+    <Suspense fallback={<div className="max-w-7xl mx-auto px-4 py-8" style={{ color: "var(--text-muted)" }}>Loading finds…</div>}>
       <ProductsContent />
     </Suspense>
   );

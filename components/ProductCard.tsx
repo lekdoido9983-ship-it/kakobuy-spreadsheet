@@ -1,144 +1,152 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
+import Link from "next/link";
 import { Product, CATEGORY_ICONS } from "@/lib/products";
-
-const CATEGORY_GRADIENTS: Record<string, string> = {
-  Shoes:       "radial-gradient(ellipse at 40% 70%, #1e3a8a 0%, #0f172a 70%)",
-  Hoodies:     "radial-gradient(ellipse at 40% 70%, #3b1d6e 0%, #0f0a1f 70%)",
-  Tees:        "radial-gradient(ellipse at 40% 70%, #7c1d6f 0%, #1a0820 70%)",
-  Jackets:     "radial-gradient(ellipse at 40% 70%, #7c3600 0%, #1c0d00 70%)",
-  Pants:       "radial-gradient(ellipse at 40% 70%, #0f4c4c 0%, #061515 70%)",
-  Tracksuits:  "radial-gradient(ellipse at 40% 70%, #1a4731 0%, #061510 70%)",
-  Accessories: "radial-gradient(ellipse at 40% 70%, #5c4000 0%, #1a1000 70%)",
-  Bags:        "radial-gradient(ellipse at 40% 70%, #5c2800 0%, #1c0a00 70%)",
-  Caps:        "radial-gradient(ellipse at 40% 70%, #1e1b4b 0%, #080714 70%)",
-  Beanies:     "radial-gradient(ellipse at 40% 70%, #1a3a5c 0%, #060f1a 70%)",
-  Belts:       "radial-gradient(ellipse at 40% 70%, #2d1b0e 0%, #0a0500 70%)",
-  Glasses:     "radial-gradient(ellipse at 40% 70%, #0a4a5c 0%, #021218 70%)",
-  Socks:       "radial-gradient(ellipse at 40% 70%, #3b1d5e 0%, #100820 70%)",
-  Boxers:      "radial-gradient(ellipse at 40% 70%, #1e3a6e 0%, #060e20 70%)",
-};
-
-const CATEGORY_ACCENT: Record<string, string> = {
-  Shoes:       "rgba(59, 130, 246, 0.3)",
-  Hoodies:     "rgba(139, 92, 246, 0.3)",
-  Tees:        "rgba(236, 72, 153, 0.3)",
-  Jackets:     "rgba(249, 115, 22, 0.3)",
-  Pants:       "rgba(20, 184, 166, 0.3)",
-  Tracksuits:  "rgba(34, 197, 94, 0.3)",
-  Accessories: "rgba(234, 179, 8, 0.3)",
-  Bags:        "rgba(249, 115, 22, 0.25)",
-  Caps:        "rgba(99, 102, 241, 0.3)",
-  Beanies:     "rgba(14, 165, 233, 0.3)",
-  Belts:       "rgba(161, 123, 86, 0.3)",
-  Glasses:     "rgba(6, 182, 212, 0.3)",
-  Socks:       "rgba(167, 139, 250, 0.3)",
-  Boxers:      "rgba(59, 130, 246, 0.25)",
-};
 
 interface Props {
   product: Product;
-  imageUrl?: string;
 }
 
-export default function ProductCard({ product, imageUrl }: Props) {
+function QuickView({ product, onClose }: { product: Product; onClose: () => void }) {
   const icon = CATEGORY_ICONS[product.category] ?? "🛍️";
-  const displayPrice = product.price ? `$${product.price.toFixed(2)}` : "Price TBD";
-  const gradient = CATEGORY_GRADIENTS[product.category] ?? "radial-gradient(ellipse at 40% 70%, #2b1e37 0%, #0f0a1a 70%)";
-  const accent = CATEGORY_ACCENT[product.category] ?? "rgba(139, 92, 246, 0.3)";
+  const displayPrice = product.price ? `$${product.price.toFixed(2).replace(/\.00$/, "")}` : "See price";
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    document.addEventListener("keydown", onKey);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prev;
+    };
+  }, [onClose]);
+
+  return createPortal(
+    <div
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4"
+      style={{ background: "rgba(8,4,14,0.78)", backdropFilter: "blur(6px)" }}
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-label={product.name}
+    >
+      <div
+        className="relative w-full max-w-xl max-h-[92vh] overflow-y-auto rounded-3xl p-6"
+        style={{
+          background: "linear-gradient(165deg, rgba(58,38,84,0.98), rgba(24,15,38,0.99))",
+          border: "1px solid var(--line)",
+          boxShadow: "0 40px 100px rgba(0,0,0,0.7)",
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-start justify-between mb-4">
+          <p className="eyebrow">A closer look</p>
+          <button
+            onClick={onClose}
+            aria-label="Close"
+            className="w-10 h-10 rounded-xl flex items-center justify-center text-lg transition-colors hover:bg-white/10"
+            style={{ border: "1px solid var(--line)", color: "var(--text)" }}
+          >
+            ✕
+          </button>
+        </div>
+
+        <div className="product-image-frame" style={{ aspectRatio: "4 / 3", borderRadius: "20px" }}>
+          {product.image ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={product.image} alt={product.name} style={{ padding: "14px" }} />
+          ) : (
+            <span style={{ fontSize: "6rem", opacity: 0.8 }}>{icon}</span>
+          )}
+        </div>
+
+        <p className="text-[0.7rem] mt-3" style={{ color: "var(--text-dim)" }}>
+          Third-party photos. Prices are indicative.
+        </p>
+
+        <span
+          className="badge mt-4"
+          style={{ background: "rgba(255,180,84,0.12)", color: "var(--amber)", border: "1px solid var(--line)" }}
+        >
+          {product.category}
+        </span>
+        <h2 className="font-black text-2xl mt-2 leading-tight" style={{ color: "var(--text)" }}>
+          {product.name}
+        </h2>
+        <div className="price-tag text-3xl mt-2 mb-5">{displayPrice}</div>
+
+        <Link href={`/product/${product.slug}`} className="btn-primary w-full py-4" onClick={onClose}>
+          Full details →
+        </Link>
+      </div>
+    </div>,
+    document.body
+  );
+}
+
+export default function ProductCard({ product }: Props) {
+  const [open, setOpen] = useState(false);
+  const icon = CATEGORY_ICONS[product.category] ?? "🛍️";
+  const displayPrice = product.price ? `$${product.price.toFixed(2).replace(/\.00$/, "")}` : "See price";
 
   return (
-    <a
-      href={product.kakobuyUrl}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="product-card block cursor-pointer"
-    >
-      <div className="m-3 mb-0">
-        <div
-          className="product-image-frame"
-          style={{ background: gradient, boxShadow: `inset 0 0 40px ${accent}` }}
-        >
-          {/* Category name watermark */}
-          <span
-            aria-hidden="true"
-            style={{
-              position: "absolute",
-              bottom: "6px",
-              left: 0,
-              right: 0,
-              textAlign: "center",
-              fontSize: "2.6rem",
-              fontWeight: 900,
-              fontFamily: "var(--font-display)",
-              color: "rgba(255,255,255,0.055)",
-              letterSpacing: "-0.04em",
-              userSelect: "none",
-              lineHeight: 1,
-              pointerEvents: "none",
-            }}
-          >
-            {product.category.toUpperCase()}
-          </span>
-
-          {imageUrl ? (
-            <img
-              src={imageUrl}
-              alt={product.name}
-              loading="lazy"
-              style={{ width: "100%", height: "100%", objectFit: "contain", position: "relative" }}
-            />
-          ) : (
-            <span style={{ fontSize: "6.5rem", lineHeight: 1, position: "relative", filter: "drop-shadow(0 8px 24px rgba(0,0,0,0.6))" }}>
-              {icon}
-            </span>
-          )}
-
-          <div className="absolute top-2 left-2">
+    <>
+      <Link
+        href={`/product/${product.slug}`}
+        className="product-card cursor-pointer"
+        onClick={(e) => {
+          if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+          e.preventDefault();
+          setOpen(true);
+        }}
+      >
+        <div className="p-2.5 pb-0">
+          <div className="product-image-frame">
+            {product.image ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={product.image} alt={product.name} loading="lazy" decoding="async" />
+            ) : (
+              <span style={{ fontSize: "4.5rem", opacity: 0.8 }}>{icon}</span>
+            )}
             <span
-              className="badge"
+              className="badge absolute top-2.5 left-2.5"
               style={{
-                background: accent,
-                color: "rgba(255,255,255,0.9)",
+                background: "rgba(16, 11, 25, 0.7)",
+                color: "var(--amber-soft)",
                 backdropFilter: "blur(8px)",
-                border: "1px solid rgba(255,255,255,0.1)",
+                border: "1px solid rgba(255,180,84,0.25)",
               }}
             >
               {product.category}
             </span>
           </div>
         </div>
-      </div>
 
-      <div className="p-3 pt-2.5">
-        <h3
-          className="text-sm font-semibold leading-snug mb-1.5"
-          style={{
-            color: "rgba(255,255,255,0.9)",
-            display: "-webkit-box",
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: "vertical",
-            overflow: "hidden",
-            minHeight: "2.5rem",
-          }}
-        >
-          {product.name}
-        </h3>
-
-        <div className="flex items-center justify-between gap-2">
-          <span className="price-tag text-base">{displayPrice}</span>
-          <span
-            className="text-xs font-bold whitespace-nowrap"
+        <div className="flex flex-col flex-1 p-3.5 pt-3">
+          <h3
+            className="text-[0.82rem] font-bold leading-snug mb-2"
             style={{
-              background: "rgba(244,179,53,0.15)",
-              color: "#f4b335",
-              padding: "3px 8px",
-              borderRadius: "999px",
-              border: "1px solid rgba(244,179,53,0.2)",
+              color: "var(--text)",
+              display: "-webkit-box",
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: "vertical",
+              overflow: "hidden",
+              minHeight: "2.3rem",
             }}
           >
-            Buy ↗
-          </span>
+            {product.name}
+          </h3>
+
+          <div className="price-tag text-xl mb-3 mt-auto">{displayPrice}</div>
+
+          <span className="buy-btn">Quick view ↗</span>
         </div>
-      </div>
-    </a>
+      </Link>
+
+      {open && <QuickView product={product} onClose={() => setOpen(false)} />}
+    </>
   );
 }
