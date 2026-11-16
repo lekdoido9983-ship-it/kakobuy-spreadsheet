@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { CATEGORIES, CATEGORY_ICONS } from "@/lib/categories";
+import PromoButton from "@/components/PromoButton";
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -40,6 +41,8 @@ export default function Navbar() {
             <Link href="/products" className={`nav-link ${isActive("/products") ? "active" : ""}`}>
               Products
             </Link>
+
+            <PromoButton className="nav-link flex items-center gap-1.5" />
 
             <div className="relative" onMouseEnter={() => setCatsOpen(true)} onMouseLeave={() => setCatsOpen(false)}>
               <button className={`nav-link flex items-center gap-1.5 ${isActive("/category") ? "active" : ""}`}>
@@ -98,6 +101,7 @@ export default function Navbar() {
               <Link href="/products" className="py-2.5 px-3 rounded-xl hover:bg-white/10 font-semibold" onClick={() => setMenuOpen(false)}>
                 Products
               </Link>
+              <PromoButton className="py-2.5 px-3 rounded-xl hover:bg-white/10 font-semibold text-left flex items-center gap-2" />
               <p className="eyebrow px-3 mt-3 mb-1">Categories</p>
               <div className="grid grid-cols-2 gap-1">
                 {CATEGORIES.map((cat) => (

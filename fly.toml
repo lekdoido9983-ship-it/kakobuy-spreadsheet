@@ -6,6 +6,12 @@ primary_region = "iad"
 
 [env]
   NODE_ENV = "production"
+  DATA_DIR = "/data"
+
+# Persistent disk for admin data (coupons, notices, product edits)
+[mounts]
+  source = "kakobuy_data"
+  destination = "/data"
 
 [http_service]
   internal_port = 3000

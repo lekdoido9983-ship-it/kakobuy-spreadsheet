@@ -36,52 +36,67 @@ function QuickView({ product, onClose }: { product: Product; onClose: () => void
       aria-label={product.name}
     >
       <div
-        className="relative w-full max-w-xl max-h-[92vh] overflow-y-auto rounded-3xl p-6"
+        className="relative w-full max-w-lg rounded-3xl p-5 flex flex-col overflow-hidden"
         style={{
+          height: "min(94dvh, 760px)",
           background: "linear-gradient(165deg, rgba(58,38,84,0.98), rgba(24,15,38,0.99))",
           border: "1px solid var(--line)",
           boxShadow: "0 40px 100px rgba(0,0,0,0.7)",
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-start justify-between mb-4">
+        <div className="flex items-center justify-between mb-3 shrink-0">
           <p className="eyebrow">A closer look</p>
           <button
             onClick={onClose}
             aria-label="Close"
-            className="w-10 h-10 rounded-xl flex items-center justify-center text-lg transition-colors hover:bg-white/10"
+            className="w-9 h-9 rounded-xl flex items-center justify-center text-base transition-colors hover:bg-white/10"
             style={{ border: "1px solid var(--line)", color: "var(--text)" }}
           >
             ✕
           </button>
         </div>
 
-        <ProductGallery
-          name={product.name}
-          full={gallery.full}
-          thumbs={gallery.thumbs}
-          aspect="4 / 3"
-          fallback={<span style={{ fontSize: "6rem", opacity: 0.8 }}>{icon}</span>}
-        />
+        <div className="flex-1 min-h-0">
+          <ProductGallery
+            name={product.name}
+            full={gallery.full}
+            thumbs={gallery.thumbs}
+            fill
+            showNote={false}
+            fallback={<span style={{ fontSize: "6rem", opacity: 0.8 }}>{icon}</span>}
+          />
+        </div>
 
-        <p className="text-[0.7rem] mt-3" style={{ color: "var(--text-dim)" }}>
-          {gallery.full.length > 1 ? "Prices are indicative." : "Third-party photos. Prices are indicative."}
-        </p>
-
-        <span
-          className="badge mt-4"
-          style={{ background: "rgba(255,180,84,0.12)", color: "var(--amber)", border: "1px solid var(--line)" }}
-        >
-          {product.category}
-        </span>
-        <h2 className="font-black text-2xl mt-2 leading-tight" style={{ color: "var(--text)" }}>
-          {product.name}
-        </h2>
-        <div className="price-tag text-3xl mt-2 mb-5">{displayPrice}</div>
-
-        <Link href={`/product/${product.slug}`} className="btn-primary w-full py-4" onClick={onClose}>
-          Full details →
-        </Link>
+        <div className="shrink-0">
+          <div className="flex items-center justify-between gap-3 mt-3">
+            <span
+              className="badge"
+              style={{ background: "rgba(255,180,84,0.12)", color: "var(--amber)", border: "1px solid var(--line)" }}
+            >
+              {product.category}
+            </span>
+            <div className="price-tag text-2xl">{displayPrice}</div>
+          </div>
+          <h2
+            className="font-black text-lg mt-2 leading-snug"
+            style={{
+              color: "var(--text)",
+              display: "-webkit-box",
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: "vertical",
+              overflow: "hidden",
+            }}
+          >
+            {product.name}
+          </h2>
+          <p className="text-[0.65rem] mt-1 mb-3" style={{ color: "var(--text-dim)" }}>
+            Third-party photos. Prices are indicative.
+          </p>
+          <Link href={`/product/${product.slug}`} className="btn-primary w-full py-3.5" onClick={onClose}>
+            Full details →
+          </Link>
+        </div>
       </div>
     </div>,
     document.body

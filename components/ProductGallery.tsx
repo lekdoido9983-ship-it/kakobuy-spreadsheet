@@ -11,6 +11,9 @@ interface Props {
   showThumbs?: boolean;
   aspect?: string;
   padding?: number;
+  /** Fill the parent's height (used in the quick view so nothing scrolls). */
+  fill?: boolean;
+  showNote?: boolean;
 }
 
 function Arrow({ dir, onClick, size = 40 }: { dir: "prev" | "next"; onClick: (e: React.MouseEvent) => void; size?: number }) {
@@ -108,7 +111,127 @@ function Lightbox({
   );
 }
 
-export default function ProductGallery({ name, full, thumbs, fallback, showThumbs = true, aspect = "1 / 1", padding = 14 }: Props) {
+/** One single row of thumbnails: scroll with the side buttons, drag with the mouse, or swipe on touch screens. */
+function ThumbStrip({ thumbs, index, setIndex }: { thumbs: string[]; index: number; setIndex: (i: number) => void }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const drag = useRef({ down: false, x: 0, left: 0, moved: false });
+  const [edges, setEdges] = useState({ left: false, right: false });
+
+  const measure = useCallback(() => {
+    const el = ref.current;
+    if (!el) return;
+    setEdges({ left: el.scrollLeft > 2, right: el.scrollLeft + el.clientWidth < el.scrollWidth - 2 });
+  }, []);
+
+  useEffect(() => {
+    measure();
+    const el = ref.current;
+    if (!el) return;
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [measure, thumbs.length]);
+
+  // keep the selected thumbnail visible (scroll the strip only, never the page)
+  useEffect(() => {
+    const el = ref.current;
+    const child = el?.children[index] as HTMLElement | undefined;
+    if (!el || !child) return;
+    const left = child.offsetLeft - (el.clientWidth - child.clientWidth) / 2;
+    el.scrollTo({ left, behavior: "smooth" });
+  }, [index]);
+
+  const scrollBy = (dir: number) => ref.current?.scrollBy({ left: dir * ref.current.clientWidth * 0.8, behavior: "smooth" });
+
+  return (
+    <div className="relative">
+      <div
+        ref={ref}
+        role="tablist"
+        aria-label="Photo thumbnails"
+        className="flex gap-2 overflow-x-auto select-none"
+        style={{ scrollbarWidth: "none", msOverflowStyle: "none", touchAction: "pan-x", cursor: "grab", padding: "2px" }}
+        onScroll={measure}
+        onPointerDown={(e) => {
+          if (e.pointerType !== "mouse") return;
+          drag.current = { down: true, x: e.clientX, left: ref.current?.scrollLeft ?? 0, moved: false };
+        }}
+        onPointerMove={(e) => {
+          const d = drag.current;
+          if (!d.down || !ref.current) return;
+          const dx = e.clientX - d.x;
+          if (Math.abs(dx) > 4) d.moved = true;
+          ref.current.scrollLeft = d.left - dx;
+        }}
+        onPointerUp={() => (drag.current.down = false)}
+        onPointerLeave={() => (drag.current.down = false)}
+        onClickCapture={(e) => {
+          if (drag.current.moved) {
+            e.preventDefault();
+            e.stopPropagation();
+            drag.current.moved = false;
+          }
+        }}
+      >
+        {thumbs.map((src, i) => (
+          <button
+            key={src}
+            type="button"
+            role="tab"
+            aria-selected={i === index}
+            aria-label={`Show photo ${i + 1}`}
+            onClick={() => setIndex(i)}
+            className="shrink-0 rounded-xl overflow-hidden transition-all"
+            style={{
+              width: 64,
+              height: 64,
+              background: "linear-gradient(180deg, rgba(70,46,100,0.55), rgba(32,20,48,0.9))",
+              border: i === index ? "2px solid var(--amber)" : "1px solid var(--line-soft)",
+              opacity: i === index ? 1 : 0.8,
+            }}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={src} alt="" loading="lazy" decoding="async" draggable={false} className="w-full h-full object-cover" />
+          </button>
+        ))}
+      </div>
+      {edges.left && (
+        <button
+          type="button"
+          aria-label="Scroll thumbnails left"
+          onClick={() => scrollBy(-1)}
+          className="absolute left-0 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full flex items-center justify-center text-base font-bold"
+          style={{ background: "rgba(16,11,25,0.88)", border: "1px solid rgba(255,180,84,0.4)", color: "var(--amber-soft)", zIndex: 4 }}
+        >
+          ‹
+        </button>
+      )}
+      {edges.right && (
+        <button
+          type="button"
+          aria-label="Scroll thumbnails right"
+          onClick={() => scrollBy(1)}
+          className="absolute right-0 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full flex items-center justify-center text-base font-bold"
+          style={{ background: "rgba(16,11,25,0.88)", border: "1px solid rgba(255,180,84,0.4)", color: "var(--amber-soft)", zIndex: 4 }}
+        >
+          ›
+        </button>
+      )}
+    </div>
+  );
+}
+
+export default function ProductGallery({
+  name,
+  full,
+  thumbs,
+  fallback,
+  showThumbs = true,
+  aspect = "1 / 1",
+  padding = 14,
+  fill = false,
+  showNote = true,
+}: Props) {
   const [index, setIndex] = useState(0);
   const [lightbox, setLightbox] = useState(false);
   const touchX = useRef<number | null>(null);
@@ -117,10 +240,18 @@ export default function ProductGallery({ name, full, thumbs, fallback, showThumb
   const go = (d: number) => setIndex((i) => (i + d + count) % count);
 
   return (
-    <div>
+    <div className={fill ? "flex flex-col h-full min-h-0" : undefined}>
       <div
         className="product-image-frame"
-        style={{ aspectRatio: aspect, borderRadius: "20px" }}
+        style={{
+          ...(fill ? { flex: "1 1 0", minHeight: 0, aspectRatio: "auto" } : { aspectRatio: aspect }),
+          borderRadius: "20px",
+          // clearly closed frame: lighter fill + visible border all the way around
+          background:
+            "radial-gradient(ellipse at 50% 38%, rgba(255,255,255,0.12), transparent 62%), linear-gradient(180deg, rgba(104,72,148,0.62), rgba(70,46,102,0.92))",
+          border: "1.5px solid rgba(255,180,84,0.4)",
+          boxShadow: "0 10px 30px rgba(0,0,0,0.35), inset 0 0 0 1px rgba(0,0,0,0.25)",
+        }}
         onTouchStart={(e) => (touchX.current = e.touches[0].clientX)}
         onTouchEnd={(e) => {
           if (touchX.current === null || count < 2) return;
@@ -160,32 +291,16 @@ export default function ProductGallery({ name, full, thumbs, fallback, showThumb
       </div>
 
       {showThumbs && count > 1 && (
-        <>
-          <p className="text-[0.7rem] mt-3 mb-3 leading-snug" style={{ color: "var(--text-dim)" }}>
-            Third-party product and QC images. These images do not establish authenticity.
-          </p>
-          <div className="grid grid-cols-5 sm:grid-cols-6 gap-2" role="tablist" aria-label="Photo thumbnails">
-            {thumbs.map((src, i) => (
-              <button
-                key={src}
-                type="button"
-                role="tab"
-                aria-selected={i === index}
-                aria-label={`Show photo ${i + 1}`}
-                onClick={() => setIndex(i)}
-                className="rounded-xl overflow-hidden aspect-square transition-all"
-                style={{
-                  background: "linear-gradient(180deg, rgba(70,46,100,0.55), rgba(32,20,48,0.9))",
-                  border: i === index ? "2px solid var(--amber)" : "1px solid var(--line-soft)",
-                  opacity: i === index ? 1 : 0.8,
-                }}
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={src} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover" />
-              </button>
-            ))}
+        <div className={fill ? "shrink-0" : undefined}>
+          {showNote && (
+            <p className="text-[0.7rem] mt-3 mb-2 leading-snug" style={{ color: "var(--text-dim)" }}>
+              Third-party product and QC images. These images do not establish authenticity.
+            </p>
+          )}
+          <div className={showNote ? "" : "mt-3"}>
+            <ThumbStrip thumbs={thumbs} index={index} setIndex={setIndex} />
           </div>
-        </>
+        </div>
       )}
 
       {lightbox && <Lightbox name={name} full={full} index={index} setIndex={setIndex} onClose={() => setLightbox(false)} />}

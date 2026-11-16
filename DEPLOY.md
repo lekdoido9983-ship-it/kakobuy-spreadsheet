@@ -12,6 +12,15 @@ fly deploy \
   --build-arg NEXT_PUBLIC_SITE_URL=https://SEU-NOME-UNICO.fly.dev \
   --build-arg NEXT_PUBLIC_QC_BASE=https://img.SEUDOMINIO.com/q
 ```
+Painel admin (`/admin`): crie o disco para guardar cupons/notificações/edições e defina a senha
+(8+ caracteres) ANTES do deploy:
+```bash
+fly volumes create kakobuy_data --size 1 --region iad
+fly secrets set ADMIN_PASSWORD="sua-senha-forte"
+```
+Depois do deploy, acesse `https://SEUDOMINIO.com/admin`. O Fly mantém 1 máquina só (o disco é de uma máquina).
+Obs.: na Vercel o `/admin` fica desligado (disco só-leitura).
+
 Segredos (newsletter), se for usar:
 ```bash
 fly secrets set NEWSLETTER_PROVIDER=brevo BREVO_API_KEY=... BREVO_LIST_ID=...
