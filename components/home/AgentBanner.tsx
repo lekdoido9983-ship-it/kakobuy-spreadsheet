@@ -1,5 +1,3 @@
-import PromoButton from "@/components/PromoButton";
-
 function Box({ w, h, x, y, rot, z }: { w: number; h: number; x: number; y: number; rot: number; z: number }) {
   return (
     <div className="ab-box" style={{ width: w, height: h, left: x, top: y, transform: `rotate(${rot}deg)`, zIndex: z }}>
@@ -20,7 +18,10 @@ export default function AgentBanner() {
             <br />
             from <span>China?</span>
           </h2>
-          <PromoButton className="ab-btn" label="Free coupons" />
+          <a href="https://ikako.vip/r/RepTitan" target="_blank" rel="noopener noreferrer" className="ab-btn">
+            <span aria-hidden>🎟️</span>
+            Free coupons
+          </a>
         </div>
         <div className="ab-boxes" aria-hidden>
           <Box w={190} h={110} x={90} y={150} rot={-3} z={3} />

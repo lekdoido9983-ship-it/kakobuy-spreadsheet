@@ -4,10 +4,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { CATEGORIES, CATEGORY_ICONS } from "@/lib/categories";
-import PromoButton from "@/components/PromoButton";
 import CurrencySwitcher from "@/components/CurrencySwitcher";
 import CommunityButton from "@/components/CommunityButton";
 import WishlistLink from "@/components/WishlistLink";
+
+const COUPONS_URL = "https://ikako.vip/r/RepTitan";
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -36,7 +37,10 @@ export default function Navbar() {
               Products
             </Link>
 
-            <PromoButton className="nav-link flex items-center gap-1.5" />
+            <a href={COUPONS_URL} target="_blank" rel="noopener noreferrer" className="nav-link flex items-center gap-1.5">
+              <span aria-hidden>🎟️</span>
+              Coupons
+            </a>
             <CommunityButton className="nav-link flex items-center gap-1.5" />
             <WishlistLink className={`nav-link flex items-center gap-1.5 ${isActive("/wishlist") ? "active" : ""}`} />
 
@@ -100,7 +104,16 @@ export default function Navbar() {
               <Link href="/products" className="py-2.5 px-3 rounded-xl hover:bg-white/10 font-semibold" onClick={() => setMenuOpen(false)}>
                 Products
               </Link>
-              <PromoButton className="py-2.5 px-3 rounded-xl hover:bg-white/10 font-semibold text-left flex items-center gap-2" />
+              <a
+                href={COUPONS_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="py-2.5 px-3 rounded-xl hover:bg-white/10 font-semibold text-left flex items-center gap-2"
+                onClick={() => setMenuOpen(false)}
+              >
+                <span aria-hidden>🎟️</span>
+                Coupons
+              </a>
               <CommunityButton className="py-2.5 px-3 rounded-xl hover:bg-white/10 font-semibold text-left flex items-center gap-2" />
               <WishlistLink className="py-2.5 px-3 rounded-xl hover:bg-white/10 font-semibold text-left flex items-center gap-2" onClick={() => setMenuOpen(false)} />
               <p className="eyebrow px-3 mt-3 mb-1">Categories</p>
