@@ -17,7 +17,7 @@ export default function CategoryView({ catName, page }: { catName: string; page:
   const base = `/category/${catName.toLowerCase()}`;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
+    <div className="site-wrap mx-auto px-4 py-8">
       <div className="flex items-center gap-2 text-xs font-semibold mb-8" style={{ color: "var(--text-dim)" }}>
         <Link href="/" className="hover:text-white transition-colors">
           Home

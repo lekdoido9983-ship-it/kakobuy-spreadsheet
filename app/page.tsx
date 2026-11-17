@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { getAllProducts, getCategoryStats, getBestSellers, getCategoryCollage, CATEGORIES } from "@/lib/products";
 import SearchBar from "@/components/SearchBar";
 import HeroMarquee from "@/components/home/HeroMarquee";
@@ -6,13 +5,15 @@ import FeaturedCategories from "@/components/home/FeaturedCategories";
 import BestSellers from "@/components/home/BestSellers";
 import AgentBanner from "@/components/home/AgentBanner";
 import Faq from "@/components/home/Faq";
+import CollageButton from "@/components/home/CollageButton";
 
 export default function HomePage() {
   const stats = getCategoryStats();
   const all = getAllProducts();
   const totalProducts = all.length;
   const marquee = getBestSellers(24);
-  const bestSellers = getBestSellers(10);
+  const browsePics = [...getCategoryCollage("Shoes", 5), ...getCategoryCollage("Hoodies", 3), ...getCategoryCollage("Tees", 3), ...getCategoryCollage("Jackets", 2)];
+  const bestPics = [...getCategoryCollage("Hoodies", 4), ...getCategoryCollage("Tracksuits", 3), ...getCategoryCollage("Pants", 3)];
 
   const categoryTiles = CATEGORIES.map((cat) => ({
     cat,
@@ -25,7 +26,7 @@ export default function HomePage() {
   return (
     <div>
       {/* Hero */}
-      <section className="relative px-4 pt-14 pb-16 max-w-7xl mx-auto">
+      <section className="relative px-4 pt-14 pb-16 site-wrap mx-auto">
         <div className="grid lg:grid-cols-[1.05fr_0.95fr] gap-12 items-center">
           <div>
             <p className="eyebrow mb-6">RepsTitan / {totalProducts.toLocaleString()} finds</p>
@@ -46,12 +47,22 @@ export default function HomePage() {
             </div>
 
             <div className="flex flex-wrap gap-3 mb-10">
-              <Link href="/products" className="btn-primary px-7 py-4">
-                Browse {totalProducts.toLocaleString()} products →
-              </Link>
-              <Link href="#best-seller" className="btn-secondary px-7 py-4">
-                ★ Best sellers
-              </Link>
+              <CollageButton
+                href="/products"
+                items={browsePics}
+                icon={
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                    <circle cx="9" cy="20" r="1.4" />
+                    <circle cx="18" cy="20" r="1.4" />
+                    <path d="M2 3h3l2.6 12.2a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 2-1.5L21 8H6" />
+                  </svg>
+                }
+              >
+                Browse {totalProducts.toLocaleString()} products
+              </CollageButton>
+              <CollageButton href="#best-seller" items={bestPics} icon={<span aria-hidden>★</span>}>
+                Best sellers
+              </CollageButton>
             </div>
 
             <div className="flex flex-wrap gap-x-10 gap-y-4">
@@ -78,7 +89,7 @@ export default function HomePage() {
 
       <FeaturedCategories tiles={categoryTiles} />
 
-      <BestSellers items={bestSellers} />
+      <BestSellers />
 
       <AgentBanner />
 

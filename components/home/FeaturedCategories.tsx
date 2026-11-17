@@ -22,7 +22,7 @@ const SLOTS: [number, number, number, number][] = [
 
 export default function FeaturedCategories({ tiles }: { tiles: CatTile[] }) {
   return (
-    <section id="categories" className="px-4 py-14 max-w-7xl mx-auto scroll-mt-24">
+    <section id="categories" className="px-4 py-14 site-wrap mx-auto scroll-mt-24">
       <div className="flex flex-wrap items-end justify-between mb-8 gap-4">
         <h2 className="section-title fc-title text-4xl md:text-6xl">
           Featured <em>categories</em>

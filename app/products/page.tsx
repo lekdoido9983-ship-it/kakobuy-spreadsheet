@@ -42,7 +42,7 @@ async function ProductsContent({ searchParams }: PageProps<"/products">) {
   const items = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
+    <div className="site-wrap mx-auto px-4 py-8">
       <div className="mb-8">
         <p className="eyebrow mb-3">The finds directory</p>
         <h1 className="section-title text-4xl md:text-5xl mb-3">
@@ -102,7 +102,7 @@ async function ProductsContent({ searchParams }: PageProps<"/products">) {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-4">
             {items.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
@@ -117,7 +117,7 @@ async function ProductsContent({ searchParams }: PageProps<"/products">) {
 
 export default function ProductsPage(props: PageProps<"/products">) {
   return (
-    <Suspense fallback={<div className="max-w-7xl mx-auto px-4 py-8 min-h-[70vh]" />}>
+    <Suspense fallback={<div className="site-wrap mx-auto px-4 py-8 min-h-[70vh]" />}>
       <ProductsContent {...props} />
     </Suspense>
   );

@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import WishlistButton from "@/components/WishlistButton";
+import TrackOpen from "@/components/TrackOpen";
+import TrackedBuyLink from "@/components/TrackedBuyLink";
 import { notFound } from "next/navigation";
 import { SITE_URL, SITE_NAME } from "@/lib/site";
 import Link from "next/link";
@@ -67,7 +69,8 @@ async function ProductContent({ params }: Pick<PageProps<"/product/[slug]">, "pa
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8">
+    <div className="max-w-[1500px] mx-auto px-4 sm:px-8 py-8">
+      <TrackOpen id={product.id} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
       <div className="flex items-center gap-2 text-xs font-semibold mb-8 flex-wrap" style={{ color: "var(--text-dim)" }}>
         <Link href="/" className="hover:text-white transition-colors">
@@ -131,10 +134,9 @@ async function ProductContent({ params }: Pick<PageProps<"/product/[slug]">, "pa
           </div>
 
           <div className="mt-auto flex flex-col gap-3">
-            <a
+            <TrackedBuyLink
+              id={product.id}
               href={product.kakobuyUrl}
-              target="_blank"
-              rel="noopener noreferrer sponsored nofollow"
               className="w-full py-5 flex items-center justify-center gap-3 rounded-2xl font-extrabold transition-transform hover:-translate-y-0.5"
               style={{ background: "linear-gradient(180deg, #fff3e4, #f3dcc7)", color: "#2a1405", fontSize: "0.95rem" }}
             >
@@ -142,7 +144,7 @@ async function ProductContent({ params }: Pick<PageProps<"/product/[slug]">, "pa
                 ✦
               </span>
               View on Kakobuy ↗
-            </a>
+            </TrackedBuyLink>
             <div className="flex items-center justify-center gap-3 text-sm font-bold" style={{ color: "var(--text-muted)" }}>
               <WishlistButton id={product.id} size={40} />
               <span>Save to wishlist</span>
@@ -168,7 +170,7 @@ async function ProductContent({ params }: Pick<PageProps<"/product/[slug]">, "pa
           <h2 className="section-title text-3xl md:text-4xl mb-8">
             More <em>{product.category}</em>
           </h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-4">
             {related.map((p) => (
               <ProductCard key={p.id} product={p} />
             ))}

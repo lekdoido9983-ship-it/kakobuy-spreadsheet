@@ -24,7 +24,7 @@ const STEPS = [
 
 export default function Faq() {
   return (
-    <section id="faq" className="px-4 py-14 max-w-7xl mx-auto scroll-mt-24">
+    <section id="faq" className="px-4 py-14 site-wrap mx-auto scroll-mt-24">
       <div className="text-center mb-10">
         <h2 className="section-title text-5xl md:text-7xl">FAQ</h2>
         <p className="mt-3 text-sm" style={{ color: "var(--text-muted)" }}>

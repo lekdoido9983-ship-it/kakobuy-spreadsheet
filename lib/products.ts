@@ -2,6 +2,7 @@ import productsData from "@/data/products.json";
 import type { Product } from "./categories";
 import { CATEGORIES } from "./categories";
 import { readStore, storeStamp } from "./store";
+import { getClickCounts } from "./clicks";
 
 export { CATEGORIES, CATEGORY_ICONS } from "./categories";
 export type { Product } from "./categories";
@@ -112,5 +113,15 @@ export function getCategoryCollage(category: string, count = 9): Product[] {
   return all()
     .filter((p) => p.category === category && p.image)
     .sort((a, b) => score(b) - score(a) || a.id - b.id)
+    .slice(0, count);
+}
+
+/** Most clicked products first (exact click ranking); ties / zero clicks fall back to the curated order. */
+export function getBestSellersByClicks(count = 50): Product[] {
+  const clicks = getClickCounts();
+  const score = (p: Product) => (p.popular ? 1000 : 0) + (p.qcN || 0);
+  return all()
+    .filter((p) => p.image && p.price && p.price > 0)
+    .sort((a, b) => (clicks[String(b.id)] || 0) - (clicks[String(a.id)] || 0) || score(b) - score(a) || a.id - b.id)
     .slice(0, count);
 }

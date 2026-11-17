@@ -7,7 +7,7 @@ const NEWSLETTER = process.env.NEXT_PUBLIC_NEWSLETTER_ENABLED === "true";
 export default function Footer() {
   return (
     <footer className="mt-24 py-12 px-4" style={{ borderTop: "1px solid var(--line-soft)", background: "rgba(10,6,16,0.6)" }}>
-      <div className="max-w-7xl mx-auto">
+      <div className="site-wrap mx-auto">
         {NEWSLETTER && (
           <div className="rounded-3xl p-6 md:p-8 mb-12 grid md:grid-cols-2 gap-6 items-center" style={{ background: "linear-gradient(165deg, rgba(48,31,70,0.7), rgba(22,14,34,0.8))", border: "1px solid var(--line)" }}>
             <div>

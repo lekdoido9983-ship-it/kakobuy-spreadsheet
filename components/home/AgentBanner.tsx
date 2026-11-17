@@ -10,7 +10,7 @@ function Box({ w, h, x, y, rot, z }: { w: number; h: number; x: number; y: numbe
 
 export default function AgentBanner() {
   return (
-    <section className="px-4 py-10 max-w-7xl mx-auto">
+    <section className="px-4 py-10 site-wrap mx-auto">
       <div className="ab-banner">
         <div className="relative z-10">
           <h2 className="ab-title">

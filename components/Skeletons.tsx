@@ -2,7 +2,7 @@ const pulse = { background: "linear-gradient(90deg, rgba(255,255,255,0.04), rgba
 
 export function ProductSkeleton() {
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8" aria-busy="true">
+    <div className="max-w-[1500px] mx-auto px-4 sm:px-8 py-8" aria-busy="true">
       <div className="h-4 w-64 rounded mb-8" style={pulse} />
       <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mb-20">
         <div className="rounded-3xl p-3" style={{ background: "rgba(48,31,70,0.6)", border: "1px solid var(--line-soft)" }}>
@@ -27,10 +27,10 @@ export function ProductSkeleton() {
 
 export function CategorySkeleton() {
   return (
-    <div className="max-w-7xl mx-auto px-4 py-10" aria-busy="true">
+    <div className="site-wrap mx-auto px-4 py-10" aria-busy="true">
       <div className="h-4 w-48 rounded mb-6" style={pulse} />
       <div className="h-12 w-60 rounded mb-8" style={pulse} />
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-4">
         {Array.from({ length: 10 }).map((_, i) => (
           <div key={i} className="rounded-2xl aspect-[3/4]" style={pulse} />
         ))}

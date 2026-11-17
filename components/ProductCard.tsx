@@ -8,6 +8,7 @@ import ProductGallery from "@/components/ProductGallery";
 import Price from "@/components/Price";
 import { preloadImages } from "@/lib/preload";
 import WishlistButton from "@/components/WishlistButton";
+import { trackClick } from "@/lib/track";
 
 interface Props {
   product: Product;
@@ -155,6 +156,7 @@ export default function ProductCard({ product, rank, tag }: Props) {
         onClick={(e) => {
           if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
           e.preventDefault();
+          trackClick(product.id, "open");
           setOpen(true);
         }}
       >
