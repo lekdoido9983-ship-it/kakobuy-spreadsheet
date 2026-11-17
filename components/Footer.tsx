@@ -22,13 +22,9 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-10">
           <div>
             <div className="flex items-center gap-3 mb-4">
-              <span
-                className="flex items-center justify-center w-9 h-9 rounded-xl"
-                style={{ background: "linear-gradient(180deg, #ffc474, #f59a3a)", color: "#2a1405", fontWeight: 900, fontSize: "0.85rem" }}
-              >
-                RT
-              </span>
-              <span className="font-black text-lg" style={{ color: "var(--amber-soft)" }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/logo.png" alt="" width={36} height={37} className="h-9 w-auto" />
+              <span className="font-black text-lg tracking-[0.04em]" style={{ color: "var(--amber-soft)" }}>
                 REPSTITAN
               </span>
             </div>

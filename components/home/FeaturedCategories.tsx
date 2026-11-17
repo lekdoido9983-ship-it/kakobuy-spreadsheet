@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { Product } from "@/lib/categories";
+import Rail from "@/components/home/Rail";
 
 export interface CatTile {
   cat: string;
@@ -31,7 +32,7 @@ export default function FeaturedCategories({ tiles }: { tiles: CatTile[] }) {
         </Link>
       </div>
 
-      <div className="fc-rail scrollbar-none">
+      <Rail className="fc-rail scrollbar-none">
         {tiles.map(({ cat, count, items }) => (
           <Link key={cat} href={`/category/${cat.toLowerCase()}`} className="fc-card group">
             <h3 className="fc-name">{cat}</h3>
@@ -55,7 +56,7 @@ export default function FeaturedCategories({ tiles }: { tiles: CatTile[] }) {
             <span className="fc-count">{count.toLocaleString()} products</span>
           </Link>
         ))}
-      </div>
+      </Rail>
     </section>
   );
 }

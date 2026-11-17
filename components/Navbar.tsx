@@ -20,20 +20,11 @@ export default function Navbar() {
     <div className="navbar-wrap">
       <nav className="navbar px-4 py-3">
         <div className="flex items-center justify-between gap-4">
-          <Link href="/" className="flex items-center gap-3 shrink-0">
-            <span
-              className="flex items-center justify-center w-10 h-10 rounded-xl text-base font-black"
-              style={{ background: "linear-gradient(180deg, #ffc474, #f59a3a)", boxShadow: "0 6px 18px rgba(245,154,58,0.35)", color: "#2a1405", letterSpacing: "-0.04em" }}
-            >
-              RT
-            </span>
-            <span className="flex flex-col leading-none">
-              <span className="font-black text-lg tracking-tight" style={{ color: "var(--amber-soft)", fontFamily: "var(--font-display)" }}>
-                REPSTITAN
-              </span>
-              <span className="text-[0.6rem] font-bold tracking-[0.3em] mt-1" style={{ color: "var(--text-dim)" }}>
-                KAKOBUY FINDS
-              </span>
+          <Link href="/" className="flex items-center gap-3 shrink-0" aria-label="RepsTitan home">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo.png" alt="" width={41} height={42} className="h-10 w-auto" />
+            <span className="font-black text-xl tracking-[0.04em]" style={{ color: "var(--amber-soft)", fontFamily: "var(--font-display)" }}>
+              REPSTITAN
             </span>
           </Link>
 

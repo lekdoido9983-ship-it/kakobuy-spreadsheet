@@ -1,6 +1,7 @@
 import Link from "next/link";
 import ProductCard from "@/components/ProductCard";
 import type { Product } from "@/lib/categories";
+import Rail from "@/components/home/Rail";
 
 export default function BestSellers({ items }: { items: Product[] }) {
   return (
@@ -17,13 +18,13 @@ export default function BestSellers({ items }: { items: Product[] }) {
         </Link>
       </div>
 
-      <div className="bs-rail scrollbar-none">
+      <Rail className="bs-rail scrollbar-none">
         {items.map((p, i) => (
           <div key={p.id} className="bs-item">
             <ProductCard product={p} rank={i + 1} tag={i < 5 ? "Best seller" : i < 8 ? "Trending" : undefined} />
           </div>
         ))}
-      </div>
+      </Rail>
     </section>
   );
 }
