@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import WishlistButton from "@/components/WishlistButton";
 import { notFound } from "next/navigation";
 import { SITE_URL, SITE_NAME } from "@/lib/site";
 import Link from "next/link";
@@ -119,7 +120,7 @@ async function ProductContent({ params }: Pick<PageProps<"/product/[slug]">, "pa
             style={{ background: "rgba(10,6,16,0.55)", border: "1px solid var(--line-soft)", color: "var(--text-muted)" }}
           >
             <p>
-              <strong style={{ color: "var(--text)" }}>Disclaimer:</strong> Kakobuy Spreadsheet is an independent directory.
+              <strong style={{ color: "var(--text)" }}>Disclaimer:</strong> RepsTitan is an independent directory.
               We do not sell, ship, or authenticate the products shown. Listing information may be inaccurate or outdated.
             </p>
             <p>
@@ -129,7 +130,7 @@ async function ProductContent({ params }: Pick<PageProps<"/product/[slug]">, "pa
             <p>Prices are indicative. Check current price, availability, shipping costs and seller terms on Kakobuy.</p>
           </div>
 
-          <div className="mt-auto">
+          <div className="mt-auto flex flex-col gap-3">
             <a
               href={product.kakobuyUrl}
               target="_blank"
@@ -142,6 +143,10 @@ async function ProductContent({ params }: Pick<PageProps<"/product/[slug]">, "pa
               </span>
               View on Kakobuy ↗
             </a>
+            <div className="flex items-center justify-center gap-3 text-sm font-bold" style={{ color: "var(--text-muted)" }}>
+              <WishlistButton id={product.id} size={40} />
+              <span>Save to wishlist</span>
+            </div>
           </div>
 
           <div className="mt-8 pt-6 space-y-3 text-sm" style={{ borderTop: "1px solid var(--line-soft)" }}>

@@ -98,3 +98,19 @@ export function getCategoryStats(): Record<string, number> {
   }
   return stats;
 }
+
+/** Most popular finds: flagged popular first, items with the most QC photos on top. */
+export function getBestSellers(count = 10): Product[] {
+  const withImg = all().filter((p) => p.image && p.price && p.price > 0);
+  const score = (p: Product) => (p.popular ? 1000 : 0) + (p.qcN || 0);
+  return [...withImg].sort((a, b) => score(b) - score(a) || a.id - b.id).slice(0, count);
+}
+
+/** Photos for a category collage (popular + QC items first). */
+export function getCategoryCollage(category: string, count = 9): Product[] {
+  const score = (p: Product) => (p.popular ? 1000 : 0) + (p.qcN || 0);
+  return all()
+    .filter((p) => p.category === category && p.image)
+    .sort((a, b) => score(b) - score(a) || a.id - b.id)
+    .slice(0, count);
+}

@@ -7,9 +7,12 @@ import { Product, CATEGORY_ICONS, galleryImages } from "@/lib/categories";
 import ProductGallery from "@/components/ProductGallery";
 import Price from "@/components/Price";
 import { preloadImages } from "@/lib/preload";
+import WishlistButton from "@/components/WishlistButton";
 
 interface Props {
   product: Product;
+  rank?: number;
+  tag?: string;
 }
 
 function QuickView({ product, onClose }: { product: Product; onClose: () => void }) {
@@ -58,6 +61,8 @@ function QuickView({ product, onClose }: { product: Product; onClose: () => void
       >
         <div className="qv-head flex items-center justify-between mb-3 shrink-0">
           <p className="eyebrow">A closer look</p>
+          <div className="flex items-center gap-2">
+          <WishlistButton id={product.id} size={36} />
           <button
             onClick={onClose}
             aria-label="Close"
@@ -66,6 +71,7 @@ function QuickView({ product, onClose }: { product: Product; onClose: () => void
           >
             ✕
           </button>
+          </div>
         </div>
 
         <div className="qv-body flex-1 min-h-0">
@@ -127,7 +133,7 @@ function QuickView({ product, onClose }: { product: Product; onClose: () => void
   );
 }
 
-export default function ProductCard({ product }: Props) {
+export default function ProductCard({ product, rank, tag }: Props) {
   const [open, setOpen] = useState(false);
   const icon = CATEGORY_ICONS[product.category] ?? "🛍️";
   // start fetching the quick-view photos the moment the pointer/finger reaches the card
@@ -171,6 +177,9 @@ export default function ProductCard({ product }: Props) {
             >
               {product.category}
             </span>
+            {tag && <span className="card-tag">{tag}</span>}
+            {rank && <span className="rank-num" aria-label={`Rank ${rank}`}>{rank}</span>}
+            <WishlistButton id={product.id} className="absolute top-2 right-2" />
           </div>
         </div>
 
@@ -193,6 +202,7 @@ export default function ProductCard({ product }: Props) {
             <Price usd={product.price} />
           </div>
 
+          {product.qcN ? <span className="qc-chip">Quality Check · {product.qcN} QC&apos;s</span> : null}
           <span className="buy-btn">Quick view ↗</span>
         </div>
       </Link>

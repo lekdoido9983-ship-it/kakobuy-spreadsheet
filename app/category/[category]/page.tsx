@@ -15,7 +15,7 @@ export async function generateMetadata({ params }: PageProps<"/category/[categor
   if (!name) return {};
   return {
     title: `${name} finds`,
-    description: `Browse ${name.toLowerCase()} from the Kakobuy spreadsheet, with photos and prices.`,
+    description: `Browse ${name.toLowerCase()} on RepsTitan, with photos and prices.`,
     alternates: { canonical: `/category/${name.toLowerCase()}` },
   };
 }

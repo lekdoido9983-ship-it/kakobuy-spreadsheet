@@ -24,16 +24,16 @@ export default function Footer() {
             <div className="flex items-center gap-3 mb-4">
               <span
                 className="flex items-center justify-center w-9 h-9 rounded-xl"
-                style={{ background: "linear-gradient(180deg, #ffc474, #f59a3a)" }}
+                style={{ background: "linear-gradient(180deg, #ffc474, #f59a3a)", color: "#2a1405", fontWeight: 900, fontSize: "0.85rem" }}
               >
-                👑
+                RT
               </span>
               <span className="font-black text-lg" style={{ color: "var(--amber-soft)" }}>
-                KAKOBUY SPREADSHEET
+                REPSTITAN
               </span>
             </div>
             <p className="text-sm leading-relaxed" style={{ color: "var(--text-dim)" }}>
-              A kingdom of finds. Browse thousands of products from Kakobuy: shoes, hoodies, jackets, bags and more.
+              Mythic finds. Browse thousands of products from Kakobuy: shoes, hoodies, jackets, bags and more.
             </p>
           </div>
 
@@ -76,7 +76,7 @@ export default function Footer() {
             <Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
             <Link href="/disclosure" className="hover:text-white transition-colors">Affiliate Disclosure</Link>
           </p>
-          <p>© 2026 Kakobuy Spreadsheet. All product links open on Kakobuy.</p>
+          <p>© 2026 RepsTitan. All product links open on Kakobuy.</p>
           <p className="mt-1">Referral links may earn us a commission on qualifying purchases.</p>
         </div>
       </div>

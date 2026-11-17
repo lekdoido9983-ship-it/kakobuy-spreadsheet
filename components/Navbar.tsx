@@ -7,6 +7,7 @@ import { CATEGORIES, CATEGORY_ICONS } from "@/lib/categories";
 import PromoButton from "@/components/PromoButton";
 import CurrencySwitcher from "@/components/CurrencySwitcher";
 import CommunityButton from "@/components/CommunityButton";
+import WishlistLink from "@/components/WishlistLink";
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -21,17 +22,17 @@ export default function Navbar() {
         <div className="flex items-center justify-between gap-4">
           <Link href="/" className="flex items-center gap-3 shrink-0">
             <span
-              className="flex items-center justify-center w-10 h-10 rounded-xl text-xl"
-              style={{ background: "linear-gradient(180deg, #ffc474, #f59a3a)", boxShadow: "0 6px 18px rgba(245,154,58,0.35)" }}
+              className="flex items-center justify-center w-10 h-10 rounded-xl text-base font-black"
+              style={{ background: "linear-gradient(180deg, #ffc474, #f59a3a)", boxShadow: "0 6px 18px rgba(245,154,58,0.35)", color: "#2a1405", letterSpacing: "-0.04em" }}
             >
-              👑
+              RT
             </span>
             <span className="flex flex-col leading-none">
               <span className="font-black text-lg tracking-tight" style={{ color: "var(--amber-soft)", fontFamily: "var(--font-display)" }}>
-                KAKOBUY
+                REPSTITAN
               </span>
               <span className="text-[0.6rem] font-bold tracking-[0.3em] mt-1" style={{ color: "var(--text-dim)" }}>
-                SPREADSHEET
+                KAKOBUY FINDS
               </span>
             </span>
           </Link>
@@ -46,6 +47,7 @@ export default function Navbar() {
 
             <PromoButton className="nav-link flex items-center gap-1.5" />
             <CommunityButton className="nav-link flex items-center gap-1.5" />
+            <WishlistLink className={`nav-link flex items-center gap-1.5 ${isActive("/wishlist") ? "active" : ""}`} />
 
             <div className="relative" onMouseEnter={() => setCatsOpen(true)} onMouseLeave={() => setCatsOpen(false)}>
               <button className={`nav-link flex items-center gap-1.5 ${isActive("/category") ? "active" : ""}`}>
@@ -109,6 +111,7 @@ export default function Navbar() {
               </Link>
               <PromoButton className="py-2.5 px-3 rounded-xl hover:bg-white/10 font-semibold text-left flex items-center gap-2" />
               <CommunityButton className="py-2.5 px-3 rounded-xl hover:bg-white/10 font-semibold text-left flex items-center gap-2" />
+              <WishlistLink className="py-2.5 px-3 rounded-xl hover:bg-white/10 font-semibold text-left flex items-center gap-2" onClick={() => setMenuOpen(false)} />
               <p className="eyebrow px-3 mt-3 mb-1">Categories</p>
               <div className="grid grid-cols-2 gap-1">
                 {CATEGORIES.map((cat) => (
