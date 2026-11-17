@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Analytics } from "@vercel/analytics/next";
 import NewsletterPopup from "@/components/NewsletterPopup";
-import WelcomePopup from "@/components/WelcomePopup";
 import { SITE_NAME, SITE_URL, SITE_DESCRIPTION } from "@/lib/site";
 import { Montserrat } from "next/font/google";
 import "./globals.css";
@@ -34,7 +33,6 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <Navbar />
         <main>{children}</main>
         <Footer />
-        <WelcomePopup />
         <NewsletterPopup />
         {process.env.VERCEL ? <Analytics /> : null}
       </body>

@@ -70,7 +70,7 @@ export const DEFAULT_SETTINGS: Settings = {
   community: {
     title: "Join our community",
     discordUrl: "https://discord.gg/your-invite",
-    telegramUrl: "https://t.me/your-channel",
+    telegramUrl: "https://t.me/repstitan",
     buttonLabel: "Join Community",
     joinUrl: "",
     text: "Daily promotions, new products and discounts every day.",
