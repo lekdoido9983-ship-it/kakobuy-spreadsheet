@@ -39,7 +39,7 @@ export default function Navbar() {
 
             <a href={COUPONS_URL} target="_blank" rel="noopener noreferrer" className="nav-link flex items-center gap-1.5">
               <span aria-hidden>🎟️</span>
-              Coupons
+              Free coupons
             </a>
             <CommunityButton className="nav-link flex items-center gap-1.5" />
             <WishlistLink className={`nav-link flex items-center gap-1.5 ${isActive("/wishlist") ? "active" : ""}`} />
@@ -112,7 +112,7 @@ export default function Navbar() {
                 onClick={() => setMenuOpen(false)}
               >
                 <span aria-hidden>🎟️</span>
-                Coupons
+                Free coupons
               </a>
               <CommunityButton className="py-2.5 px-3 rounded-xl hover:bg-white/10 font-semibold text-left flex items-center gap-2" />
               <WishlistLink className="py-2.5 px-3 rounded-xl hover:bg-white/10 font-semibold text-left flex items-center gap-2" onClick={() => setMenuOpen(false)} />
