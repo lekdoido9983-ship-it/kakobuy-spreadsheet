@@ -103,7 +103,7 @@ export function getCategoryStats(): Record<string, number> {
 
 /** Most popular finds: flagged popular first, items with the most QC photos on top. */
 export function getBestSellers(count = 10): Product[] {
-  const withImg = all().filter((p) => p.image && p.price && p.price > 0);
+  const withImg = all().filter((p) => p.image && p.price && p.price > 0 && p.category !== "Watches");
   const score = (p: Product) => (p.popular ? 1000 : 0) + (p.qcN || 0);
   return [...withImg].sort((a, b) => score(b) - score(a) || a.id - b.id).slice(0, count);
 }
@@ -124,7 +124,7 @@ export function getBestSellersByClicks(count = 50): Product[] {
   const clicks = getClickCounts();
   const score = (p: Product) => (p.popular ? 1000 : 0) + (p.qcN || 0);
   return all()
-    .filter((p) => p.image && p.price && p.price > 0)
+    .filter((p) => p.image && p.price && p.price > 0 && p.category !== "Watches")
     .sort((a, b) => (clicks[String(b.id)] || 0) - (clicks[String(a.id)] || 0) || score(b) - score(a) || a.id - b.id)
     .slice(0, count);
 }
