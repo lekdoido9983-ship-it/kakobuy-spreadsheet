@@ -1,5 +1,5 @@
 # Change "app" to a unique name when you run `fly launch --no-deploy --copy-config`
-app = "kakobuy-directory"
+app = "kakobuy-spreadsheet"
 primary_region = "iad"
 
 [build]
