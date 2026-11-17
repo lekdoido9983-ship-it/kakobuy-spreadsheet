@@ -6,7 +6,8 @@
 }
 
 :root {
-  --pad: clamp(20px, 3.4vw, 64px);
+  --pad: clamp(20px, 6vw, 130px);
+  --fade: clamp(20px, 3.4vw, 64px);
   --bg: #100b19;
   --bg-2: #1a1226;
   --text: #fff6ed;
@@ -27,13 +28,17 @@ html {
   scroll-behavior: smooth;
 }
 
-body {
-  background-color: var(--bg);
+/* page glow on its own fixed layer (background-attachment: fixed repaints on every scroll) */
+body::before {
+  content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
   background-image:
     radial-gradient(ellipse 70% 50% at 85% -5%, rgba(255, 150, 60, 0.14), transparent 60%),
     radial-gradient(ellipse 80% 60% at 0% 0%, rgba(120, 70, 190, 0.28), transparent 60%);
   background-repeat: no-repeat;
-  background-attachment: fixed;
+}
+
+body {
+  background-color: var(--bg);
   color: var(--text);
   font-family: var(--font-sans);
   min-height: 100vh;
@@ -60,9 +65,8 @@ body {
   .wish-btn {
     display: inline-flex; align-items: center; justify-content: center;
     border-radius: 999px; z-index: 5;
-    color: #fff; background: rgba(16, 11, 25, 0.62);
+    color: #fff; background: rgba(16, 11, 25, 0.78);
     border: 1px solid rgba(255, 255, 255, 0.18);
-    backdrop-filter: blur(8px);
     transition: transform 0.15s, color 0.15s, background 0.15s;
   }
   .wish-btn:hover { transform: scale(1.1); }
@@ -74,14 +78,13 @@ body {
     position: sticky;
     top: 0;
     z-index: 50;
-    padding: 12px 16px 0;
+    padding: 12px var(--pad) 0;
   }
 
   .navbar {
     max-width: 2200px;
     margin: 0 auto;
     background: linear-gradient(180deg, rgba(42, 27, 61, 0.92), rgba(24, 15, 36, 0.92));
-    backdrop-filter: blur(18px);
     border: 1px solid var(--line);
     border-radius: 24px;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.45);
@@ -429,9 +432,9 @@ body {
 .fc-card:hover { transform: translateY(-6px); border-color: rgba(255, 180, 84, 0.65); box-shadow: 0 28px 60px rgba(0, 0, 0, 0.55), 0 0 40px rgba(255, 170, 70, 0.12); }
 .fc-name { font-weight: 900; font-size: 0.82rem; letter-spacing: 0.16em; text-transform: uppercase; color: #fff0d9; padding-bottom: 8px; position: relative; }
 .fc-name::after { content: ""; position: absolute; left: 25%; right: 25%; bottom: 0; height: 2px; background: var(--amber); opacity: 0.7; border-radius: 2px; }
-.fc-collage { position: relative; width: 100%; aspect-ratio: 3 / 4; margin: 14px 0; }
+.fc-collage { position: relative; width: 100%; aspect-ratio: 3 / 4; margin: 14px 0; filter: drop-shadow(0 8px 10px rgba(0, 0, 0, 0.5)); }
 .fc-photo { position: absolute; aspect-ratio: 1 / 1; object-fit: contain; background: none; border: 0; border-radius: 0; box-shadow: none;
-  filter: drop-shadow(0 8px 10px rgba(0, 0, 0, 0.55)); transition: transform 0.35s; animation: fc-bob 5s ease-in-out infinite; }
+  transition: transform 0.35s; }
 .fc-card:hover .fc-photo { scale: 1.06; }
 @keyframes fc-bob { 0%, 100% { translate: 0 0; } 50% { translate: 0 -4px; } }
 .fc-count { font-size: 0.7rem; font-weight: 800; padding: 7px 16px; border-radius: 999px; color: var(--text); border: 1px solid var(--line); background: rgba(255, 255, 255, 0.05); }
@@ -480,8 +483,8 @@ body {
 /* draggable rails + yellow edge arrows */
 .rail-wrap { position: relative; margin-inline: calc(-1 * var(--pad)); }
 .rail-scroller { cursor: grab;
-  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 var(--pad), #000 calc(100% - var(--pad)), transparent 100%);
-  mask-image: linear-gradient(90deg, transparent 0, #000 var(--pad), #000 calc(100% - var(--pad)), transparent 100%); }
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 var(--fade), #000 calc(100% - var(--fade)), transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0, #000 var(--fade), #000 calc(100% - var(--fade)), transparent 100%); }
 .rail-scroller.rail-dragging { cursor: grabbing; scroll-snap-type: none; scroll-behavior: auto; user-select: none; }
 .rail-scroller img { -webkit-user-drag: none; user-select: none; }
 .rail-arrow {

@@ -164,16 +164,15 @@ export default function ProductCard({ product, rank, tag }: Props) {
           <div className="product-image-frame">
             {product.image ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={product.image} alt={product.name} decoding="async" />
+              <img src={product.image} alt={product.name} loading="lazy" decoding="async" />
             ) : (
               <span style={{ fontSize: "4.5rem", opacity: 0.8 }}>{icon}</span>
             )}
             <span
               className="badge absolute top-2.5 left-2.5"
               style={{
-                background: "rgba(16, 11, 25, 0.7)",
+                background: "rgba(16, 11, 25, 0.85)",
                 color: "var(--amber-soft)",
-                backdropFilter: "blur(8px)",
                 border: "1px solid rgba(255,180,84,0.25)",
               }}
             >

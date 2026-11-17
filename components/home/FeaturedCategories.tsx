@@ -45,10 +45,10 @@ export default function FeaturedCategories({ tiles }: { tiles: CatTile[] }) {
                     key={p.id}
                     src={p.image}
                     alt=""
-                    loading="eager"
+                    loading="lazy"
                     decoding="async"
                     className="fc-photo"
-                    style={{ left: `${x}%`, top: `${y}%`, width: `${w}%`, transform: `rotate(${r}deg)`, zIndex: i % 2 ? 2 : 1, animationDelay: `${(i % 4) * 0.35}s` }}
+                    style={{ left: `${x}%`, top: `${y}%`, width: `${w}%`, transform: `rotate(${r}deg)`, zIndex: i % 2 ? 2 : 1 }}
                   />
                 );
               })}

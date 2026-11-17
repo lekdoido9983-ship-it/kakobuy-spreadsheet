@@ -1,4 +1,5 @@
 import productsData from "@/data/products.json";
+import collageOk from "@/data/collage-ok.json";
 import type { Product } from "./categories";
 import { CATEGORIES } from "./categories";
 import { readStore, storeStamp } from "./store";
@@ -110,8 +111,10 @@ export function getBestSellers(count = 10): Product[] {
 /** Photos for a category collage (popular + QC items first). */
 export function getCategoryCollage(category: string, count = 9): Product[] {
   const score = (p: Product) => (p.popular ? 1000 : 0) + (p.qcN || 0);
+  // only photos with a truly transparent background (checked offline into data/collage-ok.json)
+  const ok = new Set((collageOk as Record<string, number[]>)[category] || []);
   return all()
-    .filter((p) => p.category === category && p.image)
+    .filter((p) => p.category === category && p.image && ok.has(p.id))
     .sort((a, b) => score(b) - score(a) || a.id - b.id)
     .slice(0, count);
 }
